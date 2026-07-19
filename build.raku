@@ -27,6 +27,49 @@ my %STATUS =
     divergent => ('Divergent',       'st-div',  'Behaves differently from Rakudo — see notes.'),
     ni        => ('Not implemented', 'st-ni',   'Documented for completeness; not yet in Raku++.');
 
+# Theme switcher: 'system' | 'light' | 'dark'. Runs inline in <head> so the resolved
+# theme is applied before first paint (no flash). Uses the same 'raku-theme'
+# localStorage key name and switcher UI as the raku.online playground for
+# consistency (storage is per-origin, so the two subdomains don't share a value).
+# Held as a non-interpolating q:to block because the JS is full of { } that a qq
+# string would otherwise treat as Raku interpolation.
+my $THEME-SCRIPT = q:to/JS/;
+(function () {
+  var KEY = 'raku-theme';
+  var mql = window.matchMedia('(prefers-color-scheme: dark)');
+  var ICON = { system: '◐', light: '☀', dark: '☾' };
+  function stored() { try { return localStorage.getItem(KEY) || 'system'; } catch (e) { return 'system'; } }
+  function effective(s) { return (s === 'dark' || (s === 'system' && mql.matches)) ? 'dark' : 'light'; }
+  function apply(s) {
+    var d = document.documentElement;
+    d.setAttribute('data-theme', s);
+    d.setAttribute('data-theme-active', effective(s));
+    var btn = document.querySelector('.theme-btn');
+    if (btn) btn.textContent = ICON[s] || ICON.system;
+    document.querySelectorAll('.theme-menu [data-theme-set]').forEach(function (el) {
+      el.setAttribute('aria-checked', el.getAttribute('data-theme-set') === s ? 'true' : 'false');
+    });
+  }
+  apply(stored());
+  mql.addEventListener('change', function () { if (stored() === 'system') apply('system'); });
+  window.__setTheme = function (s) { try { localStorage.setItem(KEY, s); } catch (e) {} apply(s); };
+  document.addEventListener('DOMContentLoaded', function () {
+    apply(stored());
+    var sw = document.querySelector('.theme-switch');
+    if (!sw) return;
+    var btn = sw.querySelector('.theme-btn'), menu = sw.querySelector('.theme-menu');
+    function open(o) { menu.hidden = !o; btn.setAttribute('aria-expanded', o ? 'true' : 'false'); }
+    btn.addEventListener('click', function (e) { e.stopPropagation(); open(menu.hidden); });
+    menu.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-theme-set]');
+      if (b) { window.__setTheme(b.getAttribute('data-theme-set')); open(false); btn.focus(); }
+    });
+    document.addEventListener('click', function (e) { if (!sw.contains(e.target)) open(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) { e.stopPropagation(); open(false); btn.focus(); } });
+  });
+})();
+JS
+
 # ---------------------------------------------------------------------------
 # Small text helpers
 # ---------------------------------------------------------------------------
@@ -347,10 +390,19 @@ sub page-shell(%site, Str $title, Str $body, Str $nav, :$home = False --> Str) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{esc($title)}</title>
+    <script>{$THEME-SCRIPT}</script>
     <link rel="stylesheet" href="/theme/base.css">
     </head>
     <body class="$body-class">
     <button class="nav-toggle" aria-label="Menu">☰</button>
+    <span class="theme-switch">
+    <button class="theme-btn" aria-label="Theme" aria-haspopup="true" aria-expanded="false">◐</button>
+    <ul class="theme-menu" hidden>
+    <li><button data-theme-set="system"><span class="ti">◐</span> System</button></li>
+    <li><button data-theme-set="light"><span class="ti">☀</span> Light</button></li>
+    <li><button data-theme-set="dark"><span class="ti">☾</span> Dark</button></li>
+    </ul>
+    </span>
     $nav
     <main>
     <div class="content">
