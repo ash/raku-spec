@@ -1,9 +1,9 @@
 ---
 title: Subsets
 slug: subsets
-status: full
+status: partial
 order: 50
-summary: Named types that narrow another with a `where` constraint.
+summary: Named types that narrow another with a `where` constraint (not yet enforced in Raku++).
 ---
 
 A `subset` is a named type built from an existing one plus a `where` predicate. It
@@ -22,7 +22,12 @@ say $n;
 ```
 
 `Even` is any `Int` for which `* %% 2` (divisible by two) holds. Assigning `4`
-succeeds; assigning an odd number — or a non-`Int` — would be a type-check failure.
+succeeds.
+
+> **Gap:** like [parameter `where` constraints](/subs/constraints.html), the predicate
+> is **not enforced** in Raku++ — assigning an odd number should be a type-check
+> failure (as in Rakudo) but is currently accepted. The base type (`of Int`) is still
+> checked; only the `where` predicate is skipped.
 
 ## Notes
 
