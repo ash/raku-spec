@@ -16,6 +16,7 @@
         { slug => 'control',   title => 'Control flow'            },
         { slug => 'subs',      title => 'Subroutines & signatures' },
         { slug => 'types',     title => 'Types, classes & roles'  },
+        { slug => 'phasers',   title => 'Phasers'                 },
         { slug => 'regexes',   title => 'Regexes & grammars'      },
         { slug => 'builtins',  title => 'Built-in routines'       },
     ],
