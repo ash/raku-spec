@@ -322,8 +322,10 @@ class Renderer {
 sub nav-html(%site, %by-cat, $current) {
     my @parts = '<nav class="sidebar"><a class="brand" href="/">Raku++ <span>spec</span></a>';
     for @(%site<categories>) -> %cat {
+        my @cat-pages = @(%by-cat{ %cat<slug> } // []);
+        next unless @cat-pages;   # hide categories with no pages yet
         @parts.push("<div class=\"nav-cat\"><span class=\"nav-cat-title\">{esc(%cat<title>)}</span><ul>");
-        for @(%by-cat{ %cat<slug> } // []) -> $p {
+        for @cat-pages -> $p {
             my $active = ($current.defined && $p === $current) ?? ' class="active"' !! '';
             @parts.push("<li><a$active href=\"/{$p.category}/{$p.slug}.html\">{esc($p.title)}</a></li>");
         }
@@ -406,35 +408,63 @@ sub render-home(%site, %by-cat --> Str) {
 # Verification against the real interpreter
 # ---------------------------------------------------------------------------
 
-sub verify-examples(@pages, Str $rakupp --> Int) {
-    unless $rakupp.IO.e {
+sub run-snippet(Str $exe, Str $code) {
+    my $proc = run($exe, '/dev/stdin', :in, :out, :err);
+    $proc.in.print($code);
+    $proc.in.close;
+    my $out = $proc.out.slurp(:close).subst(/ \n+ $ /, '');
+    my $err = $proc.err.slurp(:close);
+    $out, $err
+}
+
+# Verify each example's declared output against Raku++, and — when --oracle is set
+# (e.g. --oracle=raku) — against Rakudo too. The declared output should equal
+# Rakudo's (the authority); an oracle mismatch means the author didn't consult it,
+# a rakupp-only mismatch means a genuine divergence (mark the page `divergent`).
+sub verify-examples(@pages, Str $rakupp, Str $oracle --> Int) {
+    if $rakupp.contains('/') && !$rakupp.IO.e {
         note "verify: rakupp not found at $rakupp";
         return 1;
     }
+    my $has-oracle = $oracle.chars > 0;
     my $checked = 0;
-    my $failures = 0;
+    my $rakupp-fail = 0;
+    my $oracle-fail = 0;
     for @pages -> $page {
         for @($page.examples) -> @ex {
             my ($code, $expected, $line) = @ex;
             next unless $expected.defined;
             $checked++;
-            my $proc = run($rakupp, '/dev/stdin', :in, :out, :err);
-            $proc.in.print($code);
-            $proc.in.close;
-            my $got = $proc.out.slurp(:close).subst(/ \n+ $ /, '');
-            my $err = $proc.err.slurp(:close);
             my $want = $expected.subst(/ \n+ $ /, '');
+
+            my ($got, $err) = run-snippet($rakupp, $code);
             if $got ne $want {
-                $failures++;
-                note "  MISMATCH {$page.path}:$line";
+                $rakupp-fail++;
+                note "  RAKU++ MISMATCH {$page.path}:$line";
                 note "    expected: {$want.raku}";
-                note "    got:      {$got.raku}";
+                note "    rakupp:   {$got.raku}";
                 note "    stderr:   {$err.trim.raku}" if $err.trim;
+            }
+
+            if $has-oracle {
+                my ($ogot, $oerr) = run-snippet($oracle, $code);
+                if $ogot ne $want {
+                    $oracle-fail++;
+                    note "  ORACLE MISMATCH ($oracle) {$page.path}:$line";
+                    note "    expected: {$want.raku}";
+                    note "    oracle:   {$ogot.raku}";
+                    note "    stderr:   {$oerr.trim.raku}" if $oerr.trim;
+                }
             }
         }
     }
-    say "verify: $checked example(s) checked, $failures mismatch(es)";
-    $failures ?? 1 !! 0
+    if $has-oracle {
+        say "verify: $checked checked · $rakupp-fail rakupp mismatch(es) · $oracle-fail oracle mismatch(es) vs $oracle";
+    }
+    else {
+        say "verify: $checked example(s) checked, $rakupp-fail mismatch(es)";
+    }
+    ($rakupp-fail + $oracle-fail) ?? 1 !! 0
 }
 
 # ---------------------------------------------------------------------------
@@ -460,7 +490,7 @@ sub collect-pages(%site) {
     $(@pages), $(%by-cat)
 }
 
-sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFAULT) {
+sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFAULT, Str :$oracle = '') {
     my %site = EVAL slurp('src/site.raku');
 
     if $clean && 'out'.IO.d {
@@ -484,5 +514,5 @@ sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFA
 
     say "built {@($pages).elems} page(s) + home -> out/";
 
-    exit verify-examples(@($pages), $rakupp) if $verify;
+    exit verify-examples(@($pages), $rakupp, $oracle) if $verify;
 }

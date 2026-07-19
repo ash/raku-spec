@@ -4,6 +4,8 @@
 # Configuration (no paths are hard-coded here):
 #   RAKUPP      interpreter to build/verify with   (default: rakupp on PATH)
 #   SPEC_DEST   destination directory to publish to (the server's doc root)
+#   ORACLE      optional 2nd interpreter to cross-check every example against
+#               (e.g. raku = Rakudo); a divergence aborts the deploy
 #
 # Set them in a git-ignored ./.deploy.env, via the environment, or pass the
 # destination as the first argument:
@@ -22,8 +24,9 @@ DEST="${1:-$SPEC_DEST}"
 [ -n "$DEST" ]   || { echo "no destination (pass one, or set SPEC_DEST)" >&2; exit 1; }
 [ -d "$DEST" ]   || { echo "destination not found (sshfs not mounted?): $DEST" >&2; exit 1; }
 
-# Build and verify every example against the interpreter; abort the deploy on drift.
-"$RAKUPP" build.raku --clean --verify --rakupp="$RAKUPP"
+# Build and verify every example against the interpreter (and the oracle, if set);
+# abort the deploy on any drift.
+"$RAKUPP" build.raku --clean --verify --rakupp="$RAKUPP" ${ORACLE:+--oracle="$ORACLE"}
 
 # Mirror out/ to the server.
 cp -R out/. "$DEST"/

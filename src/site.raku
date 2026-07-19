@@ -8,8 +8,15 @@
     repo       => 'https://github.com/ash/raku-spec',
 
     # Order and display titles for the categories under src/pages/.
+    # (Categories with no pages yet are simply hidden until filled in.)
     categories => [
-        { slug => 'literals',  title => 'Literals'  },
-        { slug => 'operators', title => 'Operators' },
+        { slug => 'literals',  title => 'Literals & quoting'      },
+        { slug => 'variables', title => 'Variables & sigils'      },
+        { slug => 'operators', title => 'Operators'               },
+        { slug => 'control',   title => 'Control flow'            },
+        { slug => 'subs',      title => 'Subroutines & signatures' },
+        { slug => 'types',     title => 'Types, classes & roles'  },
+        { slug => 'regexes',   title => 'Regexes & grammars'      },
+        { slug => 'builtins',  title => 'Built-in routines'       },
     ],
 }
