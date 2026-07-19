@@ -384,23 +384,39 @@ sub render-page(%site, $page, %by-cat --> Str) {
 }
 
 sub render-home(%site, %by-cat --> Str) {
+    my @cats-with-pages = @(%site<categories>).grep({ @(%by-cat{ .<slug> } // []).elems });
+    my $total = @cats-with-pages.map({ @(%by-cat{ .<slug> }).elems }).sum;
+
     my @parts =
         "<div class=\"hero\"><h1>{esc(%site<title>)}</h1>" ~
-        "<p class=\"tagline\">{esc(%site<tagline>)}</p></div>";
-    for @(%site<categories>) -> %cat {
-        my @pages = @(%by-cat{ %cat<slug> } // []);
-        next unless @pages;
-        @parts.push("<section class=\"cat-block\"><h2>{esc(%cat<title>)}</h2><ul class=\"card-list\">");
+        "<p class=\"tagline\">{esc(%site<tagline>)}</p>" ~
+        "<p class=\"hero-stats\">$total features · every example verified against Raku++ and Rakudo</p>" ~
+        '</div>';
+
+    # Status legend.
+    @parts.push('<div class="legend">');
+    for <full partial divergent ni> -> $s {
+        my ($label, $cls, $) = @(%STATUS{$s});
+        @parts.push("<span class=\"leg\"><span class=\"dot $cls\"></span>{$label}</span>");
+    }
+    @parts.push('</div>');
+
+    # Compact overview: one panel per category, flowing in columns.
+    @parts.push('<div class="overview">');
+    for @cats-with-pages -> %cat {
+        my @pages = @(%by-cat{ %cat<slug> });
+        @parts.push(
+            "<section class=\"ov-cat\"><h2>{esc(%cat<title>)}" ~
+            "<span class=\"ov-count\">{@pages.elems}</span></h2><ul class=\"ov-list\">");
         for @pages -> $p {
             my ($label, $cls, $) = @(%STATUS{ $p.status });
             @parts.push(
-                "<li><a href=\"/{$p.category}/{$p.slug}.html\">" ~
-                "<span class=\"card-title\">{esc($p.title)}</span>" ~
-                "<span class=\"status $cls\">{$label}</span>" ~
-                "<span class=\"card-summary\">{esc($p.summary)}</span></a></li>");
+                "<li><a href=\"/{$p.category}/{$p.slug}.html\" title=\"{esc-attr($p.summary)}\">" ~
+                "<span class=\"dot $cls\" title=\"{$label}\"></span>{esc($p.title)}</a></li>");
         }
         @parts.push('</ul></section>');
     }
+    @parts.push('</div>');
     page-shell(%site, %site<title>, @parts.join, nav-html(%site, %by-cat, Nil), :home)
 }
 
