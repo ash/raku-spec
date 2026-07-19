@@ -28,11 +28,9 @@ DEST="${1:-$SPEC_DEST}"
 # abort the deploy on any drift.
 "$RAKUPP" build.raku --clean --verify --rakupp="$RAKUPP" ${ORACLE:+--oracle="$ORACLE"}
 
-# Mirror out/ to the server.
-cp -R out/. "$DEST"/
+# Mirror out/ to the server. COPYFILE_DISABLE stops macOS writing AppleDouble
+# (._*) sidecar files, so there is nothing to clean up afterwards — and we avoid
+# crawling the whole remote tree over sshfs, which is slow.
+COPYFILE_DISABLE=1 cp -R out/. "$DEST"/
 
-# macOS cp over sshfs leaves AppleDouble files, which the server would serve.
-find "$DEST" -name '._*' -delete 2>/dev/null || true
-
-# Count what we published without crawling the whole remote tree (slow over sshfs).
 echo "deployed $(find out -name '*.html' | wc -l | tr -d ' ') page(s) to $DEST"
