@@ -3,7 +3,7 @@
 {
     title      => 'Raku++ Specification',
     tagline    => 'How Raku++ behaves — every feature explained, with runnable, verified examples.',
-    engine     => 'https://raku.online/embed.js',
+    engine     => 'https://raku.online/raku.js',
     playground => 'https://raku.online/',
     repo       => 'https://github.com/ash/raku-spec',
 

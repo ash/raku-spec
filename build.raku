@@ -10,7 +10,7 @@
 #
 # Each feature is one Markdown-ish file under src/pages/<category>/<slug>.md with a
 # small frontmatter block. Fenced ```raku blocks become runnable, syntax-highlighted
-# editors via raku.online/embed.js — one shared WebAssembly interpreter, so no copy
+# editors via raku.online/raku.js — one shared WebAssembly interpreter, so no copy
 # of the engine lives in this repo. A ```raku block may be followed by an ```output
 # block giving its expected output; --verify runs each such block through the real
 # rakupp binary and fails the build on any mismatch, so the spec cannot drift from

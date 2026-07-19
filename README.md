@@ -26,7 +26,7 @@ src/
   site.raku           site config (title, category order) — EVAL'd by the build
   theme/
     base.css          light/dark theme; sidebar layout; status badges
-    spec.js           mobile nav toggle (editors are handled by embed.js)
+    spec.js           mobile nav toggle (editors are handled by raku.js)
   pages/
     <category>/<slug>.md   one feature per file (frontmatter + Markdown-ish body)
 out/                  generated static site (git-ignored)
@@ -95,6 +95,6 @@ RAKUPP      interpreter to build/verify with    (default: rakupp on PATH)
 SPEC_DEST   destination directory to publish to  (or pass as ./deploy.sh <dir>)
 ```
 
-The engine is **not** copied here — pages load `https://raku.online/embed.js`,
+The engine is **not** copied here — pages load `https://raku.online/raku.js`,
 reusing the interpreter and cache of the
 [raku.online](https://github.com/ash/raku.online) playground.

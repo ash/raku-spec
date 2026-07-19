@@ -1,7 +1,7 @@
 /* Raku++ Specification — base theme. Light by default; the System/Light/Dark
    switcher sets html[data-theme-active="dark"] (resolved before first paint by an
    inline <head> script, so there is no flash). The runnable editors are injected
-   by embed.js inside their own Shadow DOM, so this stylesheet only styles the page
+   by raku.js inside their own Shadow DOM, so this stylesheet only styles the page
    *around* them. */
 
 :root {

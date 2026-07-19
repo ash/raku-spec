@@ -1,5 +1,5 @@
 // spec.js — tiny bits of page chrome. The runnable editors are handled entirely
-// by embed.js (loaded after this); this wires the mobile nav toggle and reveals
+// by raku.js (loaded after this); this wires the mobile nav toggle and reveals
 // the current page in the sidebar.
 (function () {
   'use strict';
