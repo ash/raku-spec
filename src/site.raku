@@ -19,5 +19,6 @@
         { slug => 'phasers',   title => 'Phasers'                 },
         { slug => 'regexes',   title => 'Regexes & grammars'      },
         { slug => 'builtins',  title => 'Built-in routines'       },
+        { slug => 'methods',   title => 'Methods by type'        },
     ],
 }
