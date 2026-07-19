@@ -28,9 +28,10 @@ DEST="${1:-$SPEC_DEST}"
 # abort the deploy on any drift.
 "$RAKUPP" build.raku --clean --verify --rakupp="$RAKUPP" ${ORACLE:+--oracle="$ORACLE"}
 
-# Mirror out/ to the server. COPYFILE_DISABLE stops macOS writing AppleDouble
-# (._*) sidecar files, so there is nothing to clean up afterwards — and we avoid
-# crawling the whole remote tree over sshfs, which is slow.
-COPYFILE_DISABLE=1 cp -R out/. "$DEST"/
+# Mirror out/ to the server. rsync by checksum copies only files whose content
+# changed, so a deploy over the (per-file-latency) sshfs mount touches just the few
+# pages that actually differ instead of rewriting the whole tree every time.
+# COPYFILE_DISABLE stops macOS writing AppleDouble (._*) sidecar files.
+COPYFILE_DISABLE=1 rsync -rc --delete --exclude='._*' out/ "$DEST"/
 
 echo "deployed $(find out -name '*.html' | wc -l | tr -d ' ') page(s) to $DEST"
