@@ -3,8 +3,8 @@
 The behavioural specification of [Raku++](https://github.com/ash/rakupp), served at
 **[spec.raku.online](https://spec.raku.online/)**. Every feature is explained in
 detail — syntax, examples, combinations, edge cases — and **every example runs live
-in the browser** via the same WebAssembly interpreter that powers
-[raku.online](https://raku.online/).
+in the browser** via the same WebAssembly interpreter that powers the
+[raku.online](https://raku.online/) playground ([source](https://github.com/ash/raku.online)).
 
 Where [Roast](https://github.com/Raku/roast) is a conformance *test suite* and
 [docs.raku.org](https://docs.raku.org/) documents the *library*, this site aims to
@@ -96,4 +96,5 @@ SPEC_DEST   destination directory to publish to  (or pass as ./deploy.sh <dir>)
 ```
 
 The engine is **not** copied here — pages load `https://raku.online/embed.js`,
-reusing the playground's interpreter and its cache.
+reusing the interpreter and cache of the
+[raku.online](https://github.com/ash/raku.online) playground.
