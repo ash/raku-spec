@@ -472,6 +472,17 @@ body.home .content { max-width: 66rem; }
 .excel-item > h2 { margin: .1rem 0 .6rem; }
 .excel-item > h2 a { text-decoration: none; }
 .excel-item > h2 a:hover { text-decoration: underline; }
+/* Roast citation: a quoted test snippet — set off from runnable editors by a
+   left rule, so it reads as evidence rather than something to run. */
+.excel-item pre:not([data-raku]):not(.output):not(.syntax) {
+  background: var(--code-bg);
+  border-left: 3px solid var(--accent, #b23);
+  border-radius: 0 6px 6px 0;
+  padding: .6rem .85rem;
+  overflow-x: auto;
+  font-size: .84rem;
+  margin: 0 0 1.1rem;
+}
 
 /* ---- Roast conformance page ------------------------------------------- */
 

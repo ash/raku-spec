@@ -66,6 +66,17 @@ my @a[2;3] = (1,2,3),(4,5,6);
 say @a[1];      # Raku++: [4 5 6]   ·   Rakudo: not yet implemented
 ```
 
+The official suite tests exactly this and Rakudo *fudges it out* — in
+[`S09-multidim/indexing.t`](https://github.com/Raku/roast/blob/master/S09-multidim/indexing.t#L21):
+
+```
+#?rakudo todo "partially dimensioned NYI"
+lives-ok { @arr[*;0] }, 'Partially dimensioned view lives';
+```
+
+The `#?rakudo todo` directive marks a test Rakudo itself cannot yet pass. Raku++
+runs it — `@arr[*;0]` returns the column view.
+
 ## Notes
 
 - The shape is a fixed allocation: the dimension sizes never change, so

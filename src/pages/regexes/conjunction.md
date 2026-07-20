@@ -95,6 +95,18 @@ if "a1b2c3" ~~ / [ %<seen>=(<:L>) \d ]+ / {
 }
 ```
 
+The official suite has a whole 116-test file for hash aliases —
+[`S05-capture/hash.t`](https://github.com/Raku/roast/blob/master/S05-capture/hash.t)
+(spec reference `L<S05/Hash aliasing>`):
+
+```
+ok("  a b\tc" ~~ m/%<chars>=( \s+ \S+ )/, 'Named unrepeated hash capture');
+ok($/<chars>{'  a'}:exists, 'One key captured');
+```
+
+Current Rakudo no longer compiles the `%<…>=(…)` syntax (*"The use of hash
+variables in regexes is reserved"*), so it cannot run that file at all. Raku++ does.
+
 ## Notes
 
 - `&` sits at the same precedence level as alternation `|`; `&&` binds tighter,
