@@ -47,6 +47,5 @@ hello
 - Subrules can call other subrules, which is exactly how a
   [grammar](/regexes/grammars.html) is built — a grammar is a named collection of
   these rules.
-- Avoid naming a custom rule after a built-in subrule (`<ident>`, `<ws>`, `<alpha>`,
-  `<digit>`, …): Raku++ resolves such a name to the built-in rather than your lexical
-  definition, so pick a distinct name.
+- A lexical `my token`/`my regex` shadows a built-in subrule of the same name
+  (`<ws>`, `<alpha>`, …), so `<ident>` uses *your* definition inside the scope.
