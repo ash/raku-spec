@@ -144,13 +144,18 @@
     return u.replace(/^\//, '').replace(/\.html$/, '').replace(/\//g, ' › ');
   }
 
-  // Position the panel as a fixed overlay under the input, so the sidebar's
-  // overflow:auto doesn't clip it.
+  // Position the panel as a fixed overlay under the input. It's re-parented to
+  // <body> (see init) so no transformed/overflow ancestor — the sidebar becomes
+  // both on the mobile breakpoint — can clip it.
   function place() {
     var r = input.getBoundingClientRect();
+    var vw = window.innerWidth || document.documentElement.clientWidth || 360;
+    var left = Math.max(8, r.left);
+    var w = Math.min(420, vw - left - 12);
+    if (w < 240) { w = Math.min(vw - 16, 340); left = Math.max(8, (vw - w) / 2); }
     panel.style.top = (r.bottom + 6) + 'px';
-    panel.style.left = r.left + 'px';
-    panel.style.width = Math.min(400, window.innerWidth - r.left - 16) + 'px';
+    panel.style.left = left + 'px';
+    panel.style.width = w + 'px';
   }
 
   function render() {
@@ -194,6 +199,9 @@
     if (!box) return;
     input = box.querySelector('input');
     panel = box.querySelector('.ss-results');
+    // Lift the panel out of the sidebar so its fixed positioning is always
+    // viewport-relative (the sidebar is transformed/overflow-clipped on mobile).
+    document.body.appendChild(panel);
 
     input.addEventListener('focus', function () { load(render); });
     input.addEventListener('input', onInput);
@@ -208,7 +216,9 @@
         input.value = ''; panel.innerHTML = ''; panel.hidden = true; input.blur();
       }
     });
-    document.addEventListener('click', function (e) { if (!box.contains(e.target)) panel.hidden = true; });
+    document.addEventListener('click', function (e) {
+      if (!box.contains(e.target) && !panel.contains(e.target)) panel.hidden = true;
+    });
     window.addEventListener('resize', function () { if (!panel.hidden) place(); });
     document.addEventListener('keydown', function (e) {
       if (e.key === '/' && document.activeElement &&
