@@ -419,6 +419,7 @@ sub nav-html(%site, %by-cat, $current) {
     my @parts = '<nav class="sidebar"><a class="brand" href="/">Raku++ <span>spec</span></a>' ~
         '<div class="site-search"><input type="search" placeholder="Search the spec…" ' ~
         'aria-label="Search the spec" autocomplete="off" spellcheck="false">' ~
+        '<span class="ss-hint" aria-hidden="true">/</span>' ~
         '<div class="ss-results" hidden></div></div>';
     for @(%site<categories>) -> %cat {
         my @cat-pages = @(%by-cat{ %cat<slug> } // []);

@@ -86,19 +86,44 @@ a:hover { text-decoration: underline; }
   width: 100%;
   box-sizing: border-box;
   font: inherit;
-  font-size: .9rem;
-  padding: .4rem .6rem;
+  font-size: .88rem;
+  padding: .5rem .7rem .5rem 2.1rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
+  border-radius: 9px;
+  background-color: var(--bg);
   color: var(--fg);
+  /* magnifier icon on the left */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa0ad' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: .62rem center;
+  background-size: 1rem;
+  transition: border-color .15s ease, box-shadow .15s ease;
 }
 .site-search input::placeholder { color: var(--muted); }
+.site-search input:hover { border-color: var(--muted); }
 .site-search input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(200, 64, 43, .15);
+  box-shadow: 0 0 0 3px rgba(200, 64, 43, .14);
 }
+/* replace the browser's default X with nothing — Esc / the icon do the job */
+.site-search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+/* the "/" keyboard-shortcut hint, tucked at the right; hidden once you engage */
+.ss-hint {
+  position: absolute;
+  right: .5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font: 600 .7rem/1 "SF Mono", ui-monospace, Menlo, monospace;
+  color: var(--muted);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: .16rem .38rem .2rem;
+}
+.site-search input:focus ~ .ss-hint,
+.site-search input:not(:placeholder-shown) ~ .ss-hint { opacity: 0; }
 .ss-results {
   position: fixed;
   z-index: 40;
