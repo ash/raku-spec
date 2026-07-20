@@ -315,6 +315,37 @@ html[data-theme-active="dark"] .st-full { background: #123020; color: #57d383; b
 html[data-theme-active="dark"] .st-part { background: #322913; color: #e7bd55; border-color: #6b551f; }
 html[data-theme-active="dark"] .st-div  { background: #3a1e17; color: #ff8f70; border-color: #7a3826; }
 html[data-theme-active="dark"] .st-ni   { background: #24262d; color: #9aa0ad; border-color: #3a3d46; }
+.st-native { background: #eae7fb; color: #5b3fb0; border-color: #c8bef0; }
+html[data-theme-active="dark"] .st-native { background: #211c39; color: #b7a6f0; border-color: #43376f; }
+
+/* Static example for native-only features (no Run button — the browser can't run it). */
+.native-ex { position: relative; margin: 1rem 0 .3rem; }
+.native-tag {
+  position: absolute;
+  top: .5rem;
+  right: .6rem;
+  font-size: .62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #5b3fb0;
+  background: #eae7fb;
+  border: 1px solid #c8bef0;
+  border-radius: 999px;
+  padding: .12em .5em;
+}
+html[data-theme-active="dark"] .native-tag { color: #b7a6f0; background: #211c39; border-color: #43376f; }
+pre.native-code {
+  margin: 0;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .8rem .9rem 1rem;
+  overflow-x: auto;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+pre.native-code code { background: none; padding: 0; }
 
 /* runnable editors are shadow-DOM; just give them breathing room */
 pre[data-raku] {

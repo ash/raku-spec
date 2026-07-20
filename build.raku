@@ -197,6 +197,7 @@ class Page {
     has Int $.order;
     has Str $.body;
     has Str $.path;
+    has Bool $.native;        # feature works in Raku++ but not the browser (threads/IO)
     has @.examples is rw;     # list of [code, expected-or-Nil, line-number]
 }
 
@@ -234,6 +235,7 @@ sub load-page(Str $category, Str $path --> Page) {
         order    => ($meta<order> // '100').Int,
         body     => $body,
         path     => $path,
+        native   => (($meta<native> // 'false').lc eq 'true'),
         examples => [],
     )
 }
@@ -372,8 +374,15 @@ class Renderer {
         if $lang eq 'raku' | 'raku-run' {
             my $expected = self!peek-output;
             $.page.examples.push([$code, $expected, $start]);
-            my $run = so ($lang eq 'raku-run' || %opts<run>);
-            self!emit-runnable($code, %opts, $run, $expected);
+            if $.page.native {
+                # Feature needs threads/IO the browser sandbox lacks: still verified
+                # against native Raku++ and Rakudo, but shown static (no Run button).
+                self!emit-native($code, $expected);
+            }
+            else {
+                my $run = so ($lang eq 'raku-run' || %opts<run>);
+                self!emit-runnable($code, %opts, $run, $expected);
+            }
         }
         elsif $lang eq 'output' | 'text' {
             @!out.push('<pre class="output"><code>' ~ esc($code) ~ '</code></pre>');
@@ -413,6 +422,22 @@ class Renderer {
         @attrs.push('data-rows="' ~ esc-attr(~%opts<rows>) ~ '"')
             if %opts<rows>:exists && %opts<rows> !=== True;
         @!out.push('<pre ' ~ @attrs.join(' ') ~ '>' ~ esc($code) ~ '</pre>');
+        if $expected.defined {
+            @!out.push(
+                '<div class="expected"><span class="expected-label">Output</span>' ~
+                '<pre class="output"><code>' ~ esc($expected) ~ '</code></pre></div>');
+        }
+    }
+
+    # A static, non-runnable example for native-only features (concurrency, IO):
+    # the output is real (build-verified against Raku++ + Rakudo), but there is no
+    # Run button because the browser engine can't execute it.
+    method !emit-native(Str $code, $expected) {
+        @!out.push(
+            '<div class="native-ex"><span class="native-tag" title="This feature runs in ' ~
+            'native Raku++ but not in the browser playground (it needs threads or the ' ~
+            'filesystem).">native only</span>' ~
+            '<pre class="native-code"><code>' ~ esc($code) ~ '</code></pre></div>');
         if $expected.defined {
             @!out.push(
                 '<div class="expected"><span class="expected-label">Output</span>' ~
@@ -521,7 +546,8 @@ sub render-conformance(%site, %by-cat --> Str) {
       site use <a href="https://raku.online/">raku.js</a>, Raku++ compiled to WebAssembly.
       It reproduces native Raku++ on <em>every</em> example here (enforced as a build gate),
       with two limits — recursion is capped at ~200 levels, and there are no threads or
-      filesystem, so concurrency and IO features are out of scope for the playground.</p>
+      filesystem. The features that need them are documented, with verified output, under
+      <a href="/native/concurrency.html">Beyond the browser</a>.</p>
     </div>
     <h2 class="conf-areas-title">By synopsis <span>— tests that ran, per area</span></h2>
     <div class="conf-controls">
@@ -546,6 +572,11 @@ sub render-page(%site, $page, %by-cat --> Str) {
         "<div class=\"crumb\">{esc($cat-title)}</div>" ~
         "<h1>{esc($page.title)}</h1>" ~
         "<span class=\"status $cls\" title=\"{esc-attr($tip)}\">{$label}</span>" ~
+        ($page.native
+            ?? '<span class="status st-native" title="Works in Raku++ and matches Rakudo, ' ~
+               'but needs threads or the filesystem — not runnable in the browser playground.">' ~
+               'Native only</span>'
+            !! '') ~
         '</div>';
     $head ~= "<p class=\"summary\">{inline($page.summary)}</p>" if $page.summary;
     page-shell(%site, "{$page.title} — {%site<title>}", $head ~ $body, nav-html(%site, %by-cat, $page))
@@ -639,7 +670,10 @@ sub verify-examples(@pages, Str $rakupp, Str $oracle, Str $wasm = '' --> Int) {
             next unless $expected.defined;
             $checked++;
             my $want = $expected.subst(/ \n+ $ /, '');
-            @wasm-ex.push({ p => "{$page.path}:$line", s => $code, e => $want }) if $wasm;
+            # Native-only pages (concurrency/IO) can't run in the browser engine, so
+            # they're verified against rakupp + Rakudo but excluded from the WASM gate.
+            @wasm-ex.push({ p => "{$page.path}:$line", s => $code, e => $want })
+                if $wasm && !$page.native;
 
             my ($got, $err) = run-snippet($rakupp, $code);
             if $got ne $want {
