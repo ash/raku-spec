@@ -147,6 +147,15 @@ sub json-str(Str $s --> Str) {
     '"' ~ $e ~ '"'
 }
 
+# Like json-str but PRESERVES newlines/tabs as \n/\t escapes — for data where the
+# line structure is meaningful (example source & expected output), not the search
+# index (which deliberately flattens whitespace to one line).
+sub json-esc(Str $s --> Str) {
+    my $e = $s.subst('\\', '\\\\', :g).subst('"', '\\"', :g)
+             .subst("\r", '\\r', :g).subst("\n", '\\n', :g).subst("\t", '\\t', :g);
+    '"' ~ $e ~ '"'
+}
+
 # 8-char content hash over every source (theme + pages + config) — the cache tag.
 sub asset-version(--> Str) {
     my @files = dir('src/theme').grep({ .IO.f }).map(*.Str);
@@ -609,7 +618,7 @@ sub run-snippet(Str $exe, Str $code) {
 # (e.g. --oracle=raku) — against Rakudo too. The declared output should equal
 # Rakudo's (the authority); an oracle mismatch means the author didn't consult it,
 # a rakupp-only mismatch means a genuine divergence (mark the page `divergent`).
-sub verify-examples(@pages, Str $rakupp, Str $oracle --> Int) {
+sub verify-examples(@pages, Str $rakupp, Str $oracle, Str $wasm = '' --> Int) {
     if $rakupp.contains('/') && !$rakupp.IO.e {
         note "verify: rakupp not found at $rakupp";
         return 1;
@@ -618,12 +627,14 @@ sub verify-examples(@pages, Str $rakupp, Str $oracle --> Int) {
     my $checked = 0;
     my $rakupp-fail = 0;
     my $oracle-fail = 0;
+    my @wasm-ex;                       # examples to also run through raku.js (WASM)
     for @pages -> $page {
         for @($page.examples) -> @ex {
             my ($code, $expected, $line) = @ex;
             next unless $expected.defined;
             $checked++;
             my $want = $expected.subst(/ \n+ $ /, '');
+            @wasm-ex.push({ p => "{$page.path}:$line", s => $code, e => $want }) if $wasm;
 
             my ($got, $err) = run-snippet($rakupp, $code);
             if $got ne $want {
@@ -652,7 +663,30 @@ sub verify-examples(@pages, Str $rakupp, Str $oracle --> Int) {
     else {
         say "verify: $checked example(s) checked, $rakupp-fail mismatch(es)";
     }
-    ($rakupp-fail + $oracle-fail) ?? 1 !! 0
+
+    # Third gate: run every example through the Node build of raku.js — the same
+    # engine the browser editors use — so an example that passes native Raku++ but
+    # breaks in the browser (e.g. the recursion cap) is caught here, not by users.
+    my $wasm-fail = 0;
+    if $wasm {
+        if !$wasm.IO.e {
+            note "verify: raku.js engine not found at $wasm — skipping the WASM gate";
+        }
+        else {
+            my $json = '[' ~ @wasm-ex.map({
+                '{"p":' ~ json-esc(.<p>) ~ ',"s":' ~ json-esc(.<s>) ~ ',"e":' ~ json-esc(.<e>) ~ '}'
+            }).join(',') ~ ']';
+            spurt('out/.wasm-examples.json', $json);
+            my $proc = run('node', 'tools/wasm-verify.cjs', $wasm, 'out/.wasm-examples.json',
+                           :out, :err);
+            print $proc.out.slurp(:close);
+            my $werr = $proc.err.slurp(:close);
+            note $werr.trim if $werr.trim;
+            $wasm-fail = $proc.exitcode == 0 ?? 0 !! 1;
+        }
+    }
+
+    ($rakupp-fail + $oracle-fail + $wasm-fail) ?? 1 !! 0
 }
 
 # ---------------------------------------------------------------------------
@@ -678,7 +712,7 @@ sub collect-pages(%site) {
     $(@pages), $(%by-cat)
 }
 
-sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFAULT, Str :$oracle = '') {
+sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFAULT, Str :$oracle = '', Str :$wasm = '') {
     my %site = EVAL slurp('src/site.raku');
 
     if $clean && 'out'.IO.d {
@@ -723,5 +757,5 @@ sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFA
 
     say "built {@($pages).elems} page(s) + home -> out/";
 
-    exit verify-examples(@($pages), $rakupp, $oracle) if $verify;
+    exit verify-examples(@($pages), $rakupp, $oracle, $wasm) if $verify;
 }

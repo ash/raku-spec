@@ -6,6 +6,8 @@
 #   SPEC_DEST   destination directory to publish to (the server's doc root)
 #   ORACLE      optional 2nd interpreter to cross-check every example against
 #               (e.g. raku = Rakudo); a divergence aborts the deploy
+#   WASM        optional Node build of raku.js (the browser engine); every example
+#               is run through it too, so a browser-only divergence aborts the deploy
 #
 # Set them in a git-ignored ./.deploy.env, via the environment, or pass the
 # destination as the first argument:
@@ -26,7 +28,7 @@ DEST="${1:-$SPEC_DEST}"
 
 # Build and verify every example against the interpreter (and the oracle, if set);
 # abort the deploy on any drift.
-"$RAKUPP" build.raku --clean --verify --rakupp="$RAKUPP" ${ORACLE:+--oracle="$ORACLE"}
+"$RAKUPP" build.raku --clean --verify --rakupp="$RAKUPP" ${ORACLE:+--oracle="$ORACLE"} ${WASM:+--wasm="$WASM"}
 
 # Mirror out/ to the server. rsync by checksum copies only files whose content
 # changed, so a deploy over the (per-file-latency) sshfs mount touches just the few
