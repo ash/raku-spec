@@ -87,25 +87,35 @@ sub slugify(Str $s is copy --> Str) {
     $s
 }
 
-# Inline formatting. Split on backticks: even segments are prose (escaped + link /
-# bold / italic applied), odd segments are code spans (escaped, wrapped in <code>).
-# Splitting avoids placeholder sentinels — an embedded NUL byte would truncate the
-# string under rakupp's C++ string handling.
-sub inline(Str $text --> Str) {
+# Inline formatting. fmt-basic handles code spans (split on backticks) + bold/italic
+# + escaping — but NOT links. inline() renders links first (whose text may itself
+# contain a code span, e.g. `[a `Rat`](url)`), protects each with a plain-ASCII
+# sentinel, formats the rest, then splices the links back in. The sentinel is ASCII
+# because a NUL or private-use char does not survive rakupp's string handling.
+sub fmt-basic(Str $seg --> Str) {
     my @out;
-    for $text.split('`').kv -> $idx, $seg {
-        @out.push: $idx %% 2 ?? fmt-inline($seg) !! '<code>' ~ esc($seg) ~ '</code>';
+    for $seg.split('`').kv -> $idx, $s {
+        if $idx %% 2 {
+            my $t = esc($s);
+            $t = $t.subst(/ '**' (<-[*]>+) '**' /, { '<strong>' ~ (~$0) ~ '</strong>' }, :g);
+            $t = $t.subst(/ '*' (<-[*]>+) '*' /,   { '<em>' ~ (~$0) ~ '</em>' }, :g);
+            @out.push($t);
+        }
+        else {
+            @out.push('<code>' ~ esc($s) ~ '</code>');
+        }
     }
     @out.join
 }
 
-sub fmt-inline(Str $seg is copy --> Str) {
-    $seg = esc($seg);
-    $seg = $seg.subst(/ '[' (<-[ \] ]>+) ']' '(' (<-[ ) ]>+) ')' /,
-        { '<a href="' ~ esc-attr(~$1) ~ '">' ~ (~$0) ~ '</a>' }, :g);
-    $seg = $seg.subst(/ '**' (<-[*]>+) '**' /, { '<strong>' ~ (~$0) ~ '</strong>' }, :g);
-    $seg = $seg.subst(/ '*' (<-[*]>+) '*' /,   { '<em>' ~ (~$0) ~ '</em>' }, :g);
-    $seg
+sub inline(Str $text --> Str) {
+    my @links;
+    my $protected = $text.subst(/ '[' (<-[ \] ]>+) ']' '(' (<-[ ) ]>+) ')' /, {
+        @links.push('<a href="' ~ esc-attr(~$1) ~ '">' ~ fmt-basic(~$0) ~ '</a>');
+        'zXLINKXz' ~ @links.end ~ 'zXENDXz'
+    }, :g);
+    my $body = fmt-basic($protected);
+    $body.subst(/ 'zXLINKXz' (\d+) 'zXENDXz' /, { @links[+$0] }, :g)
 }
 
 # Parse a fence info string like `raku run stdin="Ada\nGrace"` into (lang, %opts).
