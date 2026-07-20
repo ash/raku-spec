@@ -558,7 +558,7 @@ sub render-conformance(%site, %by-cat --> Str) {
         <tr><td><strong>Browser</strong></td><td>the playground (raku.js)</td><td class="n">✗</td><td class="n">✗</td><td class="n">~200 levels max</td></tr>
       </tbody>
     </table></div>
-    <h2 class="conf-areas-title">By synopsis <span>— tests that ran, per area</span></h2>
+    <h2 class="conf-areas-title">By synopsis <span>— tests passing of those declared, per area</span></h2>
     <div class="conf-controls">
       <input type="search" id="conf-search" placeholder="Filter features…" aria-label="Filter features" autocomplete="off" spellcheck="false">
       <div class="conf-filters" id="conf-filters"></div>

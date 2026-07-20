@@ -12,7 +12,18 @@ sub json-str(Str $s --> Str) {
     '"' ~ $s.subst('\\', '\\\\', :g).subst('"', '\\"', :g) ~ '"'
 }
 
-sub MAIN(Str $results, Str $date = 'unknown') {
+# A file's declared test count from its first literal `plan N;` line, read straight
+# from the Roast source. -1 for a dynamic/absent plan (`plan *`, computed, or none).
+sub static-plan(Str $file --> Int) {
+    return -1 unless $file.IO.e;
+    for $file.IO.lines -> $ln {
+        if $ln ~~ /^ \s* 'plan' <.ws> (\d+) / { return +$0 }
+        if $ln ~~ /^ \s* 'plan' <.ws> '*'   / { return -1 }
+    }
+    -1
+}
+
+sub MAIN(Str $results, Str $date = 'unknown', Str $roast = '/Users/ash/roast') {
     my @rows;
     my %by-syn;                       # synopsis -> [pass, part, total-files, assertions-pass, assertions-total]
     my ($files, $ap, $at) = 0, 0, 0;
@@ -22,8 +33,13 @@ sub MAIN(Str $results, Str $date = 'unknown') {
         next unless $line ~~ / '[' (PASS|part|TIME) ']' \s+ (\d+) '/' (\d+) \s+ (\S+) /;
         my $st   = ~$0 eq 'PASS' ?? 'pass' !! (~$0 eq 'TIME' ?? 'time' !! 'part');
         my $pass = +$1;
-        my $tot  = +$2;
+        my $ran  = +$2;
         my $path = ~$3;                                   # 6.c/S02-types/subset-6c.t
+        # A partial file that aborted mid-plan ran fewer tests than it declared —
+        # show the DECLARED total (e.g. tree.t: ran 2 of plan 14), so the count
+        # matches the amber status instead of a misleading 2/2.
+        my $declared = $st eq 'part' ?? static-plan("$roast/$path") !! -1;
+        my $tot = $declared > $ran ?? $declared !! $ran;
         my $rel  = $path.subst(/^ '6.' <[cd]> '/'/, '');  # S02-types/subset-6c.t
         next unless $rel.contains('/');
         my $syn  = $rel.substr(0, $rel.index('/'));       # S02-types
