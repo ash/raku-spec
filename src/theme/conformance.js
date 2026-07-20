@@ -41,10 +41,12 @@
 
   function renderStats(d) {
     var t = d.totals;
+    // Lead with tests passing — the real measure of coverage. Files-fully-green is
+    // a strict secondary count (not a percentage, which would misread as success).
     var tiles = [
-      ['Files tested', t.files.toLocaleString()],
-      ['Fully passing', t.pass.toLocaleString() + ' · ' + pct(t.pass, t.files) + '%'],
-      ['Assertions passing', pct(t.assertPass, t.assertTotal) + '%'],
+      ['Tests passing', pct(t.assertPass, t.assertTotal) + '%'],
+      ['Tests', t.assertPass.toLocaleString() + ' / ' + t.assertTotal.toLocaleString()],
+      ['Files fully green', t.pass.toLocaleString() + ' of ' + t.files.toLocaleString()],
       ['Synopsis areas', d.synopses.length]
     ];
     document.getElementById('conf-stats').innerHTML = tiles.map(function (x) {
@@ -95,8 +97,12 @@
     var open = !!q;  // auto-expand groups while searching
     var html = keys.map(function (s) {
       var rows = groups[s];
-      var pass = rows.filter(function (r) { return r.st === 'pass'; }).length;
-      var bar = '<span class="conf-bar"><i style="width:' + pct(pass, rows.length) + '%"></i></span>';
+      // The bar and count track assertions (tests) passing, not files fully green —
+      // a synopsis with many near-complete files reads far higher on tests than on
+      // the strict file-pass ratio, and tests are the real measure of coverage.
+      var ap = rows.reduce(function (n, r) { return n + r.p; }, 0);
+      var at = rows.reduce(function (n, r) { return n + r.t; }, 0);
+      var bar = '<span class="conf-bar"><i style="width:' + pct(ap, at) + '%"></i></span>';
       var items = rows.map(function (r) {
         var st = STATUS[r.st] || STATUS.part;
         return '<li><a href="' + GH + r.path + '" target="_blank" rel="noopener">' +
@@ -106,7 +112,7 @@
       }).join('');
       return '<details class="conf-group"' + (open ? ' open' : '') + '>' +
              '<summary><span class="conf-syn">' + synTitle(s) + '</span>' +
-             '<span class="conf-syn-meta">' + pass + '/' + rows.length + ' ' + bar + '</span></summary>' +
+             '<span class="conf-syn-meta">' + ap + '/' + at + ' ' + bar + '</span></summary>' +
              '<ul class="conf-list">' + items + '</ul></details>';
     }).join('');
     root.innerHTML = html;
