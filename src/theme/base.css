@@ -460,6 +460,19 @@ body.home .content { max-width: 66rem; }
 .dot.st-div  { background: #e5534b; }
 .dot.st-ni   { background: #9aa0ad; }
 
+/* ---- "Where Raku++ excels" index -------------------------------------- */
+
+.excels { margin-top: 1.6rem; }
+.excel-item {
+  padding-top: 1.4rem;
+  margin-top: 1.4rem;
+  border-top: 1px solid var(--border);
+}
+.excel-item:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+.excel-item > h2 { margin: .1rem 0 .6rem; }
+.excel-item > h2 a { text-decoration: none; }
+.excel-item > h2 a:hover { text-decoration: underline; }
+
 /* ---- Roast conformance page ------------------------------------------- */
 
 .conf-head h1 { margin: 0 0 .3rem; }

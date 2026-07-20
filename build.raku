@@ -608,17 +608,47 @@ sub render-page(%site, $page, %by-cat --> Str) {
     page-shell(%site, "{$page.title} — {%site<title>}", $head ~ $body, nav-html(%site, %by-cat, $page))
 }
 
-# Count the demonstrated features on a page: each `## ` section (bar Notes) is one
-# named feature with its own example. Fence-aware so `##` inside code never counts.
+# Count the demonstrated features on a page: each `## ` section (bar Notes and the
+# "excels" divergence note) is one named feature with its own example. Fence-aware
+# so `##` inside code never counts.
 sub count-features(Str $body --> Int) {
     my $n = 0;
     my $in-fence = False;
     for $body.lines -> $line {
         if $line.starts-with('```') { $in-fence = !$in-fence; next }
         next if $in-fence;
-        $n++ if $line.starts-with('## ') && !$line.starts-with('## Notes');
+        $n++ if $line.starts-with('## ')
+             && !$line.starts-with('## Notes')
+             && $line.trim ne EXCELS-HEADING;
     }
     $n
+}
+
+# Heading that marks a page's "Raku++ goes beyond Rakudo" section. The build
+# collects every one of these into the /excels/ index (render-excels), so the list
+# stays current automatically — add the section to a page and it shows up there.
+constant EXCELS-HEADING = '## Where Raku++ excels';
+
+# Pull the excels section out of a page body: the lines after EXCELS-HEADING, up to
+# the next `## ` heading or end of file. Fence-aware so a `##` inside a code block
+# never ends it. Returns '' when the page has no such section.
+sub extract-excels(Str $body --> Str) {
+    my @lines = $body.lines;
+    my $in-fence = False;
+    my $start = -1;
+    my $i = 0;
+    while $i < @lines.elems {
+        my $line = @lines[$i];
+        if $line.starts-with('```') {
+            $in-fence = !$in-fence;
+        }
+        elsif !$in-fence && $line.starts-with('## ') {
+            last if $start >= 0;                              # next section ends it
+            $start = $i + 1 if $line.trim eq EXCELS-HEADING;
+        }
+        $i++;
+    }
+    $start < 0 ?? '' !! @lines[$start ..^ $i].join("\n").trim
 }
 
 sub render-home(%site, %by-cat --> Str) {
@@ -628,12 +658,15 @@ sub render-home(%site, %by-cat --> Str) {
         .map({ @(%by-cat{ .<slug> }) }).flat
         .map({ count-features($_.body) }).sum;
 
+    my $excels-link = excels-entries(%site, %by-cat)
+        ?? ' <a href="/excels/">Where Raku++ excels →</a>' !! '';
     my @parts =
         "<div class=\"hero\"><h1>{esc(%site<title>)}</h1>" ~
         "<p class=\"tagline\">{esc(%site<tagline>)}</p>" ~
         "<p class=\"hero-stats\">$features features across $pages pages · " ~
         "every example verified against Raku++, Rakudo, and the in-browser engine</p>" ~
-        "<p class=\"hero-links\"><a href=\"/conformance/\">See the full Roast conformance map →</a></p>" ~
+        "<p class=\"hero-links\"><a href=\"/conformance/\">See the full Roast conformance map →</a>" ~
+        "{$excels-link}</p>" ~
         '</div>';
 
     # Status legend.
@@ -661,6 +694,48 @@ sub render-home(%site, %by-cat --> Str) {
     }
     @parts.push('</div>');
     page-shell(%site, %site<title>, @parts.join, nav-html(%site, %by-cat, Nil), :home)
+}
+
+# The /excels/ index: one entry per page that carries a "Where Raku++ excels"
+# section, in category order. Each entry re-renders that section's own Markdown (so
+# its runnable example works here too) under a heading linking back to the feature
+# page. Auto-collected — no hand-maintained list.
+sub excels-entries(%site, %by-cat) {
+    my @out;
+    for @(%site<categories>) -> %cat {
+        for @(%by-cat{ %cat<slug> } // []) -> $p {
+            my $md = extract-excels($p.body);
+            next unless $md;
+            @out.push({ cat => %cat<title>, page => $p, md => $md });
+        }
+    }
+    @out
+}
+
+sub render-excels(%site, %by-cat --> Str) {
+    my @entries = excels-entries(%site, %by-cat);
+    my $intro = q:to/BODY/;
+    <div class="conf-head">
+      <h1>Where Raku++ excels</h1>
+      <p class="tagline">Places where Raku++ accepts and runs code the reference
+      implementation does not — constructs Rakudo rejects at compile time or leaves
+      unimplemented. Every example below runs live in your browser.</p>
+    </div>
+    BODY
+    my @cards;
+    for @entries -> %e {
+        my $p = %e<page>;
+        my $rendered = Renderer.new(lines => %e<md>.lines, page => $p).render;
+        @cards.push(
+            '<section class="excel-item">' ~
+            "<div class=\"crumb\">{esc(%e<cat>)}</div>" ~
+            "<h2><a href=\"/{$p.category}/{$p.slug}/\">{esc($p.title)}</a></h2>" ~
+            $rendered ~
+            '</section>');
+    }
+    my $body = $intro ~ '<div class="excels">' ~ @cards.join ~ '</div>';
+    page-shell(%site, 'Where Raku++ excels — Raku++ Specification', $body,
+               nav-html(%site, %by-cat, Nil))
 }
 
 # ---------------------------------------------------------------------------
@@ -801,6 +876,14 @@ sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFA
         mkdir('out/conformance');
         spurt('out/conformance/index.html', render-conformance(%site, $by-cat));
         spurt('out/roast-map.json', slurp('src/data/roast-map.json'));
+    }
+
+    # "Where Raku++ excels" index — emitted only when some page carries the section.
+    my @excels = excels-entries(%site, $by-cat);
+    if @excels {
+        mkdir('out/excels');
+        spurt('out/excels/index.html', render-excels(%site, $by-cat));
+        say "  excels: {@excels.elems} entr{ @excels.elems == 1 ?? 'y' !! 'ies' } -> out/excels/";
     }
 
     # Client-side search index: one {u,t,b} record per page, loaded by search.js.
