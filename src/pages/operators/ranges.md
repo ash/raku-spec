@@ -50,6 +50,22 @@ say [+] ^5;
 10
 ```
 
+## Fractional endpoints
+
+When an endpoint is not an integer, the range keeps its real endpoints and steps
+by `1` from the low end — the fractional part carries through every element. The
+top endpoint still bounds the sequence, so the last element is the largest one
+that does not pass it.
+
+```raku
+say (1.1 .. 4).list;
+say (1.5 .. 5).elems;
+```
+```output
+(1.1 2.1 3.1)
+4
+```
+
 ## Notes
 
 - Ranges are lazy: `1..Inf` is a valid, unbounded range you can take from without
