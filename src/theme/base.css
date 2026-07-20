@@ -347,6 +347,37 @@ pre.native-code {
 }
 pre.native-code code { background: none; padding: 0; }
 
+/* Per-page "where it runs" indicator: three execution targets. */
+.modes { display: flex; flex-wrap: wrap; gap: .4rem; margin: .1rem 0 1.4rem; }
+.mode {
+  display: inline-flex;
+  align-items: center;
+  gap: .35em;
+  font-size: .74rem;
+  font-weight: 600;
+  padding: .2em .6em;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--code-bg);
+}
+.mode .mk { font-weight: 700; }
+.mode.ok .mk { color: #1a7f37; }
+.mode.no { color: #b3401f; }
+.mode.no .mk { color: #b3401f; }
+html[data-theme-active="dark"] .mode.ok .mk { color: #57d383; }
+html[data-theme-active="dark"] .mode.no, html[data-theme-active="dark"] .mode.no .mk { color: #ff8f70; }
+
+/* Execution-modes table on the conformance page. */
+.conf-modes-intro { color: var(--muted); font-size: .92rem; margin: .2rem 0 .8rem; }
+.conf-modes-tbl { width: 100%; border-collapse: collapse; font-size: .9rem; margin-bottom: 1.6rem; }
+.conf-modes-tbl th, .conf-modes-tbl td { text-align: left; padding: .5rem .7rem; border-bottom: 1px solid var(--border); }
+.conf-modes-tbl th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.conf-modes-tbl td.y { color: #1a7f37; font-weight: 700; }
+.conf-modes-tbl td.n { color: #b3401f; font-weight: 700; }
+html[data-theme-active="dark"] .conf-modes-tbl td.y { color: #57d383; }
+html[data-theme-active="dark"] .conf-modes-tbl td.n { color: #ff8f70; }
+
 /* runnable editors are shadow-DOM; just give them breathing room */
 pre[data-raku] {
   display: block;

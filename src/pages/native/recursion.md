@@ -2,16 +2,18 @@
 title: Deep recursion
 slug: recursion
 status: full
-native: true
+browser: false
+browser-why: recursion is capped at ~200 levels in the browser
 order: 30
-summary: Native Raku++ recurses without limit; the browser engine caps at ~200 levels.
+summary: The interpreter and --exe recurse without limit; the browser engine caps at ~200 levels.
 ---
 
-Recursion depth is the one place a perfectly ordinary program runs in native Raku++
-but not in the browser. The WebAssembly engine shares the host JavaScript call stack,
-which a page can't grow, so recursion is capped at **~200 levels**; native Raku++ has
-no such limit. The example below (1000 deep) is verified against native Raku++ and
-Rakudo, but would hit the cap in the playground.
+Recursion depth is the one place a perfectly ordinary program runs in the Raku++
+interpreter (and `--exe`) but not in the browser. The WebAssembly engine shares the
+host JavaScript call stack, which a page can't grow, so recursion is capped at
+**~200 levels**; the interpreter and native binary have no such limit. The example
+below (1000 deep) is verified against Raku++ and Rakudo, but would hit the cap in the
+playground.
 
 ## Recursing a thousand deep
 

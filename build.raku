@@ -197,7 +197,8 @@ class Page {
     has Int $.order;
     has Str $.body;
     has Str $.path;
-    has Bool $.native;        # feature works in Raku++ but not the browser (threads/IO)
+    has Bool $.browser-ok;    # runs in the browser (WASM) engine, not just the interpreter/--exe
+    has Str $.browser-why;    # if not: the reason (threads / filesystem / deep recursion)
     has @.examples is rw;     # list of [code, expected-or-Nil, line-number]
 }
 
@@ -232,11 +233,12 @@ sub load-page(Str $category, Str $path --> Page) {
         title    => $meta<title>,
         status   => $status,
         summary  => $meta<summary> // '',
-        order    => ($meta<order> // '100').Int,
-        body     => $body,
-        path     => $path,
-        native   => (($meta<native> // 'false').lc eq 'true'),
-        examples => [],
+        order       => ($meta<order> // '100').Int,
+        body        => $body,
+        path        => $path,
+        browser-ok  => (($meta<browser> // 'true').lc ne 'false'),
+        browser-why => ($meta<browser-why> // ''),
+        examples    => [],
     )
 }
 
@@ -374,10 +376,10 @@ class Renderer {
         if $lang eq 'raku' | 'raku-run' {
             my $expected = self!peek-output;
             $.page.examples.push([$code, $expected, $start]);
-            if $.page.native {
+            if !$.page.browser-ok {
                 # Feature needs threads/IO the browser sandbox lacks: still verified
-                # against native Raku++ and Rakudo, but shown static (no Run button).
-                self!emit-native($code, $expected);
+                # against the interpreter and Rakudo, but shown static (no Run button).
+                self!emit-static($code, $expected);
             }
             else {
                 my $run = so ($lang eq 'raku-run' || %opts<run>);
@@ -429,14 +431,13 @@ class Renderer {
         }
     }
 
-    # A static, non-runnable example for native-only features (concurrency, IO):
-    # the output is real (build-verified against Raku++ + Rakudo), but there is no
-    # Run button because the browser engine can't execute it.
-    method !emit-native(Str $code, $expected) {
+    # A static, non-runnable example for features the browser engine can't execute
+    # (concurrency, IO, deep recursion): the output is real (build-verified against the
+    # interpreter + Rakudo), but there is no Run button.
+    method !emit-static(Str $code, $expected) {
         @!out.push(
-            '<div class="native-ex"><span class="native-tag" title="This feature runs in ' ~
-            'native Raku++ but not in the browser playground (it needs threads or the ' ~
-            'filesystem).">native only</span>' ~
+            '<div class="native-ex"><span class="native-tag" title="Runs in the Raku++ ' ~
+            'interpreter and --exe binary, but not the browser playground.">not in browser</span>' ~
             '<pre class="native-code"><code>' ~ esc($code) ~ '</code></pre></div>');
         if $expected.defined {
             @!out.push(
@@ -542,13 +543,20 @@ sub render-conformance(%site, %by-cat --> Str) {
       see <a href="RAKUPP_REPO/blob/main/docs/ROAST.md">ROAST.md</a> (standing &amp;
       per-synopsis breakdown) and <a href="RAKUPP_REPO/blob/main/docs/COUNTING.md">COUNTING.md</a>
       (exact definition of every figure).</p>
-      <p class="conf-note"><strong>In the browser:</strong> the runnable examples on this
-      site use <a href="https://raku.online/">raku.js</a>, Raku++ compiled to WebAssembly.
-      It reproduces native Raku++ on <em>every</em> example here (enforced as a build gate),
-      with two limits — recursion is capped at ~200 levels, and there are no threads or
-      filesystem. The features that need them are documented, with verified output, under
-      <a href="/native/concurrency.html">Beyond the browser</a>.</p>
     </div>
+    <h2 class="conf-areas-title">Execution modes</h2>
+    <p class="conf-modes-intro">A Raku++ program can run three ways. Every example on
+    this site is verified to give the same output in all three — except features that
+    need capabilities the browser sandbox lacks, documented under
+    <a href="/native/concurrency.html">Beyond the browser</a>.</p>
+    <div class="table-wrap"><table class="conf-modes-tbl">
+      <thead><tr><th>Mode</th><th>How to run</th><th>Threads</th><th>Files &amp; IO</th><th>Deep recursion</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Interpreter</strong></td><td><code>rakupp x.raku</code></td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+        <tr><td><strong>Native</strong></td><td><code>rakupp --exe x.raku</code></td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+        <tr><td><strong>Browser</strong></td><td>the playground (raku.js)</td><td class="n">✗</td><td class="n">✗</td><td class="n">✗ ~200</td></tr>
+      </tbody>
+    </table></div>
     <h2 class="conf-areas-title">By synopsis <span>— tests that ran, per area</span></h2>
     <div class="conf-controls">
       <input type="search" id="conf-search" placeholder="Filter features…" aria-label="Filter features" autocomplete="off" spellcheck="false">
@@ -562,6 +570,25 @@ sub render-conformance(%site, %by-cat --> Str) {
                nav-html(%site, %by-cat, Nil), :extra-scripts($extra))
 }
 
+# Where a feature runs: the three execution targets. Interpreter and --exe run
+# everything; the browser (WASM) engine is the only constrained one, and a page marks
+# itself `browser: false` (+ optional `browser-why`) when a feature needs threads, the
+# filesystem, or deep recursion.
+sub modes-html($page --> Str) {
+    my $ok  = $page.browser-ok;
+    my $why = $page.browser-why || 'needs threads, the filesystem, or deep recursion';
+    my $tip = $ok ?? 'Runs in the browser playground (raku.js / WebAssembly)'
+                  !! "Not in the browser playground — $why";
+    '<div class="modes" title="Where this feature runs">' ~
+    '<span class="mode ok" title="rakupp — the Raku++ tree-walking interpreter">' ~
+      '<span class="mk">✓</span> Interpreter</span>' ~
+    '<span class="mode ok" title="rakupp --exe — compiled to a standalone native binary">' ~
+      '<span class="mk">✓</span> Native (--exe)</span>' ~
+    "<span class=\"mode {$ok ?? 'ok' !! 'no'}\" title=\"{esc-attr($tip)}\">" ~
+      "<span class=\"mk\">{$ok ?? '✓' !! '✗'}</span> Browser</span>" ~
+    '</div>'
+}
+
 sub render-page(%site, $page, %by-cat --> Str) {
     my ($label, $cls, $tip) = @(%STATUS{ $page.status });
     my $r = Renderer.new(lines => $page.body.lines, page => $page);
@@ -572,13 +599,9 @@ sub render-page(%site, $page, %by-cat --> Str) {
         "<div class=\"crumb\">{esc($cat-title)}</div>" ~
         "<h1>{esc($page.title)}</h1>" ~
         "<span class=\"status $cls\" title=\"{esc-attr($tip)}\">{$label}</span>" ~
-        ($page.native
-            ?? '<span class="status st-native" title="Works in Raku++ and matches Rakudo, ' ~
-               'but needs threads or the filesystem — not runnable in the browser playground.">' ~
-               'Native only</span>'
-            !! '') ~
         '</div>';
     $head ~= "<p class=\"summary\">{inline($page.summary)}</p>" if $page.summary;
+    $head ~= modes-html($page);
     page-shell(%site, "{$page.title} — {%site<title>}", $head ~ $body, nav-html(%site, %by-cat, $page))
 }
 
@@ -670,10 +693,10 @@ sub verify-examples(@pages, Str $rakupp, Str $oracle, Str $wasm = '' --> Int) {
             next unless $expected.defined;
             $checked++;
             my $want = $expected.subst(/ \n+ $ /, '');
-            # Native-only pages (concurrency/IO) can't run in the browser engine, so
-            # they're verified against rakupp + Rakudo but excluded from the WASM gate.
+            # Pages the browser engine can't run (concurrency/IO/deep recursion) are
+            # verified against rakupp + Rakudo but excluded from the WASM gate.
             @wasm-ex.push({ p => "{$page.path}:$line", s => $code, e => $want })
-                if $wasm && !$page.native;
+                if $wasm && $page.browser-ok;
 
             my ($got, $err) = run-snippet($rakupp, $code);
             if $got ne $want {

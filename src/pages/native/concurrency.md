@@ -2,17 +2,18 @@
 title: Concurrency — start, await, react
 slug: concurrency
 status: full
-native: true
+browser: false
+browser-why: needs OS threads
 order: 10
 summary: Promises, supplies and channels — real in Raku++, but the browser can't run threads.
 ---
 
 Raku++ implements Raku's high-level concurrency: `start` runs a block on another
 thread and hands back a `Promise`, `await` waits for results, and `react`/`whenever`
-consume asynchronous `Supply` streams. These **work in native Raku++** and match
-Rakudo — but the in-browser playground is single-threaded, so the examples here are
-shown with their verified output rather than a Run button (see
-[the conformance page](/conformance.html) for why).
+consume asynchronous `Supply` streams. These **run in the Raku++ interpreter and the
+`--exe` native binary** and match Rakudo — but the in-browser playground is
+single-threaded, so the examples here are shown with their verified output rather than
+a Run button (see [Execution modes](/conformance.html) for why).
 
 ## start and await
 
@@ -90,4 +91,5 @@ say $c.list.sort;
   `Supply`/`supply`/`emit`/`tap`, `Channel`, and `react`/`whenever`.
 - These need real OS threads, which the browser WebAssembly sandbox doesn't provide —
   that's why they're documented here rather than run live.
-- In native Raku++ the same code runs with `rakupp yourprogram.raku`.
+- Run them with the interpreter (`rakupp program.raku`) or compile a native binary
+  (`rakupp --exe program.raku`); both support threads.

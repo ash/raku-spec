@@ -2,14 +2,16 @@
 title: File & process IO
 slug: io
 status: full
-native: true
+browser: false
+browser-why: needs the filesystem and subprocesses
 order: 20
 summary: Read and write files, run subprocesses — real in Raku++, but there's no browser filesystem.
 ---
 
 Raku++ can read and write files and launch subprocesses, exactly as Rakudo does. The
 browser playground has **no filesystem and can't spawn processes**, so these examples
-are shown with their verified native output rather than a Run button.
+are shown with their verified output (from the interpreter and `--exe`) rather than a
+Run button.
 
 ## Running a subprocess
 
@@ -46,5 +48,5 @@ beta
   to iterate, `IO::Path` methods (`.e`, `.d`, `.add`, `.unlink`) for paths.
 - `run`/`shell` start subprocesses; `:out`/`:err` capture their streams.
 - `$*TMPDIR`, `$*CWD`, `$*HOME` are `IO::Path` handles to standard locations.
-- None of this exists in the browser sandbox — run such programs with native
-  `rakupp yourprogram.raku`.
+- None of this exists in the browser sandbox — run such programs with the interpreter
+  (`rakupp program.raku`) or a compiled binary (`rakupp --exe program.raku`).
