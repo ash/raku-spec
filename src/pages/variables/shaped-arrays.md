@@ -54,6 +54,18 @@ say @c.shape;
 (2 2 2)
 ```
 
+## Where Raku++ excels
+
+Indexing a shaped array with **fewer** subscripts than it has dimensions takes a
+*partial view* — here, a whole row. Raku++ returns it. Rakudo compiles the same
+code but throws at runtime (*"Partially dimensioned views of shaped arrays not yet
+implemented. Sorry."*), so this is a Raku++ extension.
+
+```raku
+my @a[2;3] = (1,2,3),(4,5,6);
+say @a[1];      # Raku++: [4 5 6]   ·   Rakudo: not yet implemented
+```
+
 ## Notes
 
 - The shape is a fixed allocation: the dimension sizes never change, so

@@ -81,6 +81,20 @@ say ("aaa" ~~ m:exhaustive/a+/).map(~*);
 (aaa aa a aa a a)
 ```
 
+## Where Raku++ excels
+
+The `@<name>=(…)` array alias has a hash-valued sibling, `%<name>=(…)`, which
+collects each matched substring as a **key** (reached through `$<name>`). Rakudo
+reserves `%`-sigil variables in regex syntax and rejects the construct at compile
+time (*"The use of hash variables in regexes is reserved"*), so this one is
+Raku++-only.
+
+```raku
+if "a1b2c3" ~~ / [ %<seen>=(<:L>) \d ]+ / {
+    say $<seen>.keys.sort;   # Raku++: (a b c)   ·   Rakudo: won't compile
+}
+```
+
 ## Notes
 
 - `&` sits at the same precedence level as alternation `|`; `&&` binds tighter,
