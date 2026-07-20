@@ -16,6 +16,28 @@
     });
   }
 
+  // Accordion sidebar: clicking a section title opens it and closes the others,
+  // so only one section is expanded at a time. The current page's section starts
+  // open (marked server-side).
+  var cats = document.querySelectorAll('.nav-cat');
+  function eachCat(fn) { Array.prototype.forEach.call(cats, fn); }
+  eachCat(function (cat) {
+    var btn = cat.querySelector('.nav-cat-title');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var wasOpen = cat.classList.contains('open');
+      eachCat(function (c) {
+        c.classList.remove('open');
+        var b = c.querySelector('.nav-cat-title');
+        if (b) b.setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        cat.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
   // Scroll the nav list (not the page, and not the pinned head) so the current
   // page's entry — and its siblings in the same section — are in view on load.
   var scroller = document.querySelector('.sidebar-nav');

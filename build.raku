@@ -154,6 +154,7 @@ sub asset-version(--> Str) {
         @files.append: dir($cat).grep({ .IO.f && .Str.ends-with('.md') }).map(*.Str);
     }
     @files.push('src/site.raku');
+    @files.push('src/data/roast-map.json') if 'src/data/roast-map.json'.IO.e;
     my $blob = @files.sort.map({ slurp($_) }).join;
     my $p = run('md5', '-q', :in, :out);
     $p.in.print($blob);
@@ -417,26 +418,39 @@ class Renderer {
 
 sub nav-html(%site, %by-cat, $current) {
     my @parts = '<nav class="sidebar"><div class="sidebar-head">' ~
-        '<a class="brand" href="/">Raku++ <span>spec</span></a>' ~
+        '<a class="brand" href="/">Raku++<span>spec</span></a>' ~
         '<div class="site-search"><input type="search" placeholder="Search the spec…" ' ~
         'aria-label="Search the spec" autocomplete="off" spellcheck="false">' ~
         '<span class="ss-hint" aria-hidden="true">/</span>' ~
         '<div class="ss-results" hidden></div></div></div><div class="sidebar-nav">';
+    # The sidebar is an accordion: only one section is expanded at a time. On a
+    # page, its own section starts open; on the home page, the first section does.
+    my $cur-cat = $current.defined ?? $current.category !! '';
+    my $first   = True;
     for @(%site<categories>) -> %cat {
         my @cat-pages = @(%by-cat{ %cat<slug> } // []);
         next unless @cat-pages;   # hide categories with no pages yet
-        @parts.push("<div class=\"nav-cat\"><span class=\"nav-cat-title\">{esc(%cat<title>)}</span><ul>");
+        my $open = ($cur-cat eq %cat<slug>) || ($cur-cat eq '' && $first);
+        $first = False;
+        my $ocls = $open ?? ' open' !! '';
+        my $aria = $open ?? 'true' !! 'false';
+        @parts.push(
+            "<div class=\"nav-cat$ocls\">" ~
+            "<button class=\"nav-cat-title\" type=\"button\" aria-expanded=\"$aria\">" ~
+            "<span class=\"nav-cat-chev\" aria-hidden=\"true\"></span>" ~
+            "<span class=\"nav-cat-name\">{esc(%cat<title>)}</span></button>" ~
+            "<div class=\"nav-cat-body\"><ul>");
         for @cat-pages -> $p {
             my $active = ($current.defined && $p === $current) ?? ' class="active"' !! '';
             @parts.push("<li><a$active href=\"/{$p.category}/{$p.slug}.html\">{esc($p.title)}</a></li>");
         }
-        @parts.push('</ul></div>');
+        @parts.push('</ul></div></div>');
     }
     @parts.push('</div></nav>');
     @parts.join
 }
 
-sub page-shell(%site, Str $title, Str $body, Str $nav, :$home = False --> Str) {
+sub page-shell(%site, Str $title, Str $body, Str $nav, :$home = False, :$extra-scripts = '' --> Str) {
     my $engine     = esc-attr(%site<engine>);
     my $playground = esc-attr(%site<playground>);
     my $repo       = esc-attr(%site<repo>);
@@ -473,10 +487,32 @@ sub page-shell(%site, Str $title, Str $body, Str $nav, :$home = False --> Str) {
     </main>
     <script src="/theme/spec.js?v={$VERSION}" defer></script>
     <script src="/theme/search.js?v={$VERSION}" defer></script>
+    $extra-scripts
     <script src="$engine"></script>
     </body>
     </html>
     HTML
+}
+
+# The Roast conformance map — a special page rendering the committed
+# src/data/roast-map.json snapshot into a filterable table (see conformance.js).
+sub render-conformance(%site, %by-cat --> Str) {
+    my $body = q:to/BODY/;
+    <div class="conf-head">
+      <h1>Roast conformance</h1>
+      <p class="tagline">Where Raku++ stands against <a href="https://github.com/Raku/roast">Roast</a>,
+      the official Raku specification test suite — the same tests this spec is verified against.</p>
+      <div class="conf-stats" id="conf-stats"></div>
+    </div>
+    <div class="conf-controls">
+      <input type="search" id="conf-search" placeholder="Filter features…" aria-label="Filter features" autocomplete="off" spellcheck="false">
+      <div class="conf-filters" id="conf-filters"></div>
+    </div>
+    <div class="conf-table" id="conf-table" aria-live="polite">Loading the conformance map…</div>
+    BODY
+    my $extra = "<script src=\"/theme/conformance.js?v={$VERSION}\" defer></script>";
+    page-shell(%site, 'Roast conformance — Raku++ Specification', $body,
+               nav-html(%site, %by-cat, Nil), :extra-scripts($extra))
 }
 
 sub render-page(%site, $page, %by-cat --> Str) {
@@ -494,14 +530,32 @@ sub render-page(%site, $page, %by-cat --> Str) {
     page-shell(%site, "{$page.title} — {%site<title>}", $head ~ $body, nav-html(%site, %by-cat, $page))
 }
 
+# Count the demonstrated features on a page: each `## ` section (bar Notes) is one
+# named feature with its own example. Fence-aware so `##` inside code never counts.
+sub count-features(Str $body --> Int) {
+    my $n = 0;
+    my $in-fence = False;
+    for $body.lines -> $line {
+        if $line.starts-with('```') { $in-fence = !$in-fence; next }
+        next if $in-fence;
+        $n++ if $line.starts-with('## ') && !$line.starts-with('## Notes');
+    }
+    $n
+}
+
 sub render-home(%site, %by-cat --> Str) {
     my @cats-with-pages = @(%site<categories>).grep({ @(%by-cat{ .<slug> } // []).elems });
-    my $total = @cats-with-pages.map({ @(%by-cat{ .<slug> }).elems }).sum;
+    my $pages    = @cats-with-pages.map({ @(%by-cat{ .<slug> }).elems }).sum;
+    my $features = @cats-with-pages
+        .map({ @(%by-cat{ .<slug> }) }).flat
+        .map({ count-features($_.body) }).sum;
 
     my @parts =
         "<div class=\"hero\"><h1>{esc(%site<title>)}</h1>" ~
         "<p class=\"tagline\">{esc(%site<tagline>)}</p>" ~
-        "<p class=\"hero-stats\">$total features · every example verified against Raku++ and Rakudo</p>" ~
+        "<p class=\"hero-stats\">$features features across $pages pages · " ~
+        "every example verified against Raku++ and Rakudo</p>" ~
+        "<p class=\"hero-links\"><a href=\"/conformance.html\">See the full Roast conformance map →</a></p>" ~
         '</div>';
 
     # Status legend.
@@ -635,12 +689,21 @@ sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFA
     }
     spurt('out/index.html', render-home(%site, $by-cat));
 
+    # Roast conformance map (special page + its committed data snapshot).
+    if 'src/data/roast-map.json'.IO.e {
+        spurt('out/conformance.html', render-conformance(%site, $by-cat));
+        spurt('out/roast-map.json', slurp('src/data/roast-map.json'));
+    }
+
     # Client-side search index: one {u,t,b} record per page, loaded by search.js.
     my @entries;
     for @($pages) -> $p {
         my $u = "/{$p.category}/{$p.slug}.html";
         my $b = ($p.summary ~ ' ' ~ index-body($p.body)).trim;
-        $b = $b.substr(0, 1800) if $b.chars > 1800;
+        # Cap generously so every term on a page stays searchable (the old 1800
+        # limit truncated longer pages, hiding tail content like `samewith` from
+        # search); 8000 covers every current page in full.
+        $b = $b.substr(0, 8000) if $b.chars > 8000;
         @entries.push('{"u":' ~ json-str($u) ~ ',"t":' ~ json-str($p.title)
                         ~ ',"b":' ~ json-str($b) ~ '}');
     }
