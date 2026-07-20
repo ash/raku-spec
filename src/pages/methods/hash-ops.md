@@ -27,21 +27,20 @@ say %h<a>;
 
 This is the idiom for grouping — collect everything that shares a key.
 
-## Map — value access
+## Map — the immutable hash
 
-`Map.new` builds a hash-like collection; lookups work as on a `Hash`.
+`Map` is the immutable sibling of `Hash`: build it once and read from it. Its type is
+distinct from `Hash`.
 
 ```raku
 my $m = Map.new("a", 1, "b", 2);
 say $m<a>;
+say $m.^name;
 ```
 ```output
 1
+Map
 ```
-
-> In Rakudo a `Map` is a *distinct immutable* type (`.^name` is `Map`); Raku++ backs
-> it with an ordinary `Hash` (`.^name` is `Hash`), so it is not actually immutable
-> here. Lookups behave identically — don't rely on `Map` for immutability in Raku++.
 
 ## Notes
 

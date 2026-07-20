@@ -1,13 +1,13 @@
 ---
 title: Case methods
 slug: case
-status: partial
+status: full
 order: 20
-summary: Upper, lower, and title case — with .wordcase not yet implemented in Raku++.
+summary: Upper, lower, title, and per-word case conversions.
 ---
 
-`Str` offers a family of case conversions. `.uc`/`.lc` (upper/lower) and `.tc`/`.tclc`
-(title-case the first letter) work as in Rakudo; `.wordcase` is the gap (see below).
+`Str` offers a family of case conversions: `.uc`/`.lc` (upper/lower), `.tc`/`.tclc`
+(title-case the first letter), and `.wordcase` (title-case every word).
 
 ## Title-casing
 
@@ -26,21 +26,16 @@ Hello
 `.tc` touches only the first letter, so `hello world` becomes `Hello world` (the `w`
 stays lower).
 
-## Gap: .wordcase
+## wordcase — every word
 
-`.wordcase` should title-case **every** word. Rakudo does; Raku++ currently returns
-the string unchanged.
+`.wordcase` title-cases **each** word, not just the first.
 
 ```raku
 say "hello world".wordcase;
 ```
-
-| Call | Rakudo (reference) | Raku++ |
-| ---- | ------------------ | ------ |
-| `"hello world".wordcase` | `Hello World` | `hello world` |
-
-> Run the block to see Raku++'s result. Until `.wordcase` is implemented, title-case
-> each word yourself, e.g. `.split(" ").map(*.tc).join(" ")`.
+```output
+Hello World
+```
 
 ## Notes
 

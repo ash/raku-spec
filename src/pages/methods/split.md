@@ -1,14 +1,14 @@
 ---
 title: Splitting a string
 slug: split
-status: partial
+status: full
 order: 25
-summary: Break a string on a separator or regex — with two Raku++ gaps (:skip-empty, .comb(n)).
+summary: Break a string on a separator or regex, with a limit, :skip-empty, or into chunks.
 ---
 
 `.split` breaks a string into a list on a separator, which can be a string or a
-regex, with an optional limit. The basic forms match Rakudo; the `:skip-empty` adverb
-and chunk-size `.comb(n)` are the current gaps.
+regex, with an optional limit and the `:skip-empty` adverb. `.comb` is the
+complement — it keeps the pieces rather than the gaps.
 
 ## Split on a string or regex
 
@@ -32,34 +32,28 @@ say "a-b-c".split("-", 2);
 (a b-c)
 ```
 
-## Gap: :skip-empty
+## Drop empties with :skip-empty
 
-`:skip-empty` should drop empty fields (e.g. the trailing empty after a final
-separator). Raku++ keeps them.
+`:skip-empty` removes empty fields — such as the trailing empty left after a final
+separator.
 
 ```raku
 say "a1b2c3".split(/\d/, :skip-empty);
 ```
+```output
+(a b c)
+```
 
-| Call | Rakudo (reference) | Raku++ |
-| ---- | ------------------ | ------ |
-| `"a1b2c3".split(/\d/, :skip-empty)` | `(a b c)` | `(a b c )` |
+## comb into fixed-size chunks
 
-## Gap: .comb with a chunk size
-
-`.comb(n)` should return **n-character chunks**; Raku++ ignores the size and returns
-single characters.
+`.comb(n)` returns **n-character chunks** (the complement of splitting).
 
 ```raku
 say "hello".comb(2);
 ```
-
-| Call | Rakudo (reference) | Raku++ |
-| ---- | ------------------ | ------ |
-| `"hello".comb(2)` | `(he ll o)` | `(h e l l o)` |
-
-> Run the blocks to see Raku++'s results. Until these land, filter empties with
-> `.grep(*.chars)` and chunk with `.comb(/../)` or `.rotor` instead.
+```output
+(he ll o)
+```
 
 ## Notes
 

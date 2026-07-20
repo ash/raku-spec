@@ -44,5 +44,5 @@ say @out;
 - The result is lazy: `gather` doesn't run the block until the list is consumed, so
   `gather { … take … }` can even be infinite and taken from with `[^n]`.
 - `take` returns its argument, so `my $v = take $x` both emits and keeps the value.
-- Assigning the result to an `@array` reifies it; a bare `gather` in a `say` is the
-  lazy `Seq` — one place Raku++ prints it as `[…]` where Rakudo prints `(…)`.
+- Assigning the result to an `@array` reifies it; a bare `gather` is the lazy `Seq`,
+  which you take from with `[^n]` or reify with `.list`/`.Array`.

@@ -28,5 +28,5 @@ The pattern `"AB"` is all uppercase, so `hello` becomes `HELLO`; a mixed pattern
 - Related case methods (`.uc`, `.lc`, `.tc`, `.tclc`) are on the
   [Case methods](/methods/case.html) page; `.samecase` differs by taking its casing
   from another string rather than a fixed rule.
-- `.indent` (add leading spaces to each line) is **not yet implemented** in Raku++ —
-  use a manual `.lines.map(" " x $n ~ *).join("\n")` for now.
+- `.indent(n)` is a related layout method — it adds `n` leading spaces to each line
+  (a negative `n` removes indentation).

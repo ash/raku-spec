@@ -1,14 +1,13 @@
 ---
 title: Rounding — floor / ceiling / round / truncate
 slug: rounding
-status: divergent
+status: full
 order: 60
-summary: Round to integers or a precision — with one Raku++/Rakudo difference on negative halves.
+summary: Round to integers or a precision, with the half-way rule Rakudo uses.
 ---
 
 Four routines turn a fractional number into a whole one: `floor` (down), `ceiling`
-(up), `truncate` (toward zero), and `round` (to nearest). Most cases agree exactly
-with Rakudo; `round` differs on negative half-values — see the divergence below.
+(up), `truncate` (toward zero), and `round` (to nearest).
 
 ## floor, ceiling, truncate
 
@@ -41,29 +40,27 @@ say 3.14159.round(0.01);
 3.14
 ```
 
-## Divergence: rounding negative halves
+## Halves round toward +∞
 
-For a value exactly halfway, **Rakudo rounds toward +∞**, while **Raku++ rounds away
-from zero**. They agree on positive halves and disagree on negative ones:
+For a value exactly halfway, `round` rounds **toward +∞** — so a positive `.5` goes
+up and a negative `.5` goes toward zero.
 
 ```raku
+say 3.5.round;
 say (-3.5).round;
 say (-2.5).round;
 ```
+```output
+4
+-3
+-2
+```
 
-| Input | Rakudo (reference) | Raku++ |
-| ----- | ------------------ | ------ |
-| `(-3.5).round` | `-3` | `-4` |
-| `(-2.5).round` | `-2` | `-3` |
-| `3.5.round`    | `4`  | `4`  |
-
-> Run the block above to see Raku++'s result live. Positive halves (`3.5 → 4`) match;
-> only negative halves differ. This is a Raku++ divergence from the reference.
+`3.5` rounds up to `4`; `-3.5` rounds up to `-3` (not `-4`).
 
 ## Notes
 
 - The half-way rule only matters for values ending exactly in `.5`; every other
-  value rounds to the genuinely nearest integer identically in both.
-- `floor`, `ceiling`, and `truncate` have no half-way ambiguity and match Rakudo
-  everywhere.
+  value rounds to the genuinely nearest integer.
+- `floor`, `ceiling`, and `truncate` have no half-way ambiguity.
 - `.Int` on a fractional number truncates toward zero — the same as `.truncate`.

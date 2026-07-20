@@ -39,7 +39,6 @@ say <a b c>.permutations.map(*.join).sort;
 
 - Both are lazy `Seq`s, so `.permutations` of a large list is fine to take from with
   `[^k]` without generating all `n!` up front.
-- When you `say` the raw sublists, Raku++ renders each inner list as `[…]` where
-  Rakudo shows `(…)` — a display difference only; joining or counting them agrees.
+- Each result is a sublist, so `say` shows them nested — `((1 2) (1 3) (2 3))`.
 - For random selection instead of exhaustive generation, use `.pick` (without
   replacement) or `.roll` (with replacement).

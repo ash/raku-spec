@@ -24,10 +24,11 @@ say $n;
 `Even` is any `Int` for which `* %% 2` (divisible by two) holds. Assigning `4`
 succeeds.
 
-> **Gap:** like [parameter `where` constraints](/subs/constraints.html), the predicate
-> is **not enforced** in Raku++ — assigning an odd number should be a type-check
-> failure (as in Rakudo) but is currently accepted. The base type (`of Int`) is still
-> checked; only the `where` predicate is skipped.
+> **Gap:** a subset's `where` predicate is **not yet enforced** in Raku++ — assigning
+> (or passing) an odd number should be a type-check failure (as in Rakudo) but is
+> currently accepted. The base type (`of Int`) *is* checked; only the `where` part is
+> skipped. Note this differs from a direct
+> [parameter `where` constraint](/subs/constraints.html), which *is* enforced.
 
 ## Notes
 
