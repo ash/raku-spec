@@ -555,7 +555,7 @@ sub render-conformance(%site, %by-cat --> Str) {
       <tbody>
         <tr><td><strong>Interpreter</strong></td><td><code>rakupp x.raku</code></td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
         <tr><td><strong>Native</strong></td><td><code>rakupp --exe x.raku</code></td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
-        <tr><td><strong>Browser</strong></td><td>the playground (raku.js)</td><td class="n">✗</td><td class="n">✗</td><td class="n">✗ ~200</td></tr>
+        <tr><td><strong>Browser</strong></td><td>the playground (raku.js)</td><td class="n">✗</td><td class="n">✗</td><td class="n">~200 levels max</td></tr>
       </tbody>
     </table></div>
     <h2 class="conf-areas-title">By synopsis <span>— tests that ran, per area</span></h2>
