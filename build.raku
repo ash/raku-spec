@@ -491,7 +491,7 @@ sub page-shell(%site, Str $title, Str $body, Str $nav, :$home = False, :$extra-s
     </div>
     <footer>
     <span>Raku++ Specification — behaviour of <a href="$playground">raku.online</a>'s interpreter.</span>
-    <span>Examples run live in your browser via WebAssembly. <a href="$repo">Source</a>.</span>
+    <span>Examples run live in your browser via WebAssembly, each verified to match native Raku++. <a href="$repo">Source</a>.</span>
     </footer>
     </main>
     <script src="/theme/spec.js?v={$VERSION}" defer></script>
@@ -517,6 +517,11 @@ sub render-conformance(%site, %by-cat --> Str) {
       see <a href="RAKUPP_REPO/blob/main/docs/ROAST.md">ROAST.md</a> (standing &amp;
       per-synopsis breakdown) and <a href="RAKUPP_REPO/blob/main/docs/COUNTING.md">COUNTING.md</a>
       (exact definition of every figure).</p>
+      <p class="conf-note"><strong>In the browser:</strong> the runnable examples on this
+      site use <a href="https://raku.online/">raku.js</a>, Raku++ compiled to WebAssembly.
+      It reproduces native Raku++ on <em>every</em> example here (enforced as a build gate),
+      with two limits — recursion is capped at ~200 levels, and there are no threads or
+      filesystem, so concurrency and IO features are out of scope for the playground.</p>
     </div>
     <h2 class="conf-areas-title">By synopsis <span>— tests that ran, per area</span></h2>
     <div class="conf-controls">
@@ -570,7 +575,7 @@ sub render-home(%site, %by-cat --> Str) {
         "<div class=\"hero\"><h1>{esc(%site<title>)}</h1>" ~
         "<p class=\"tagline\">{esc(%site<tagline>)}</p>" ~
         "<p class=\"hero-stats\">$features features across $pages pages · " ~
-        "every example verified against Raku++ and Rakudo</p>" ~
+        "every example verified against Raku++, Rakudo, and the in-browser engine</p>" ~
         "<p class=\"hero-links\"><a href=\"/conformance.html\">See the full Roast conformance map →</a></p>" ~
         '</div>';
 

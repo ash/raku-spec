@@ -435,6 +435,17 @@ body.home .content { max-width: 66rem; }
 @media (max-width: 640px) { .conf-denom-note { display: none; } }
 
 .conf-source { font-size: .85rem; color: var(--muted); margin: 0 0 .5rem; }
+.conf-note {
+  font-size: .88rem;
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .7rem .9rem;
+  margin: .6rem 0 0;
+}
+.conf-note strong { font-weight: 600; }
 
 .conf-areas-title { font-size: 1.1rem; margin: 1.5rem 0 .3rem; }
 .conf-areas-title span { color: var(--muted); font-weight: 400; font-size: .9rem; }
