@@ -30,8 +30,9 @@ narrows it, and `{*}` hands off to the one that fits.
 ## Notes
 
 - A `proto` is optional — a bare set of `multi`s works — but it documents the family
-  and lets you constrain what *any* candidate may accept.
-- Because the `{*}` can be surrounded by code, a `proto` can validate or transform
-  arguments once, before dispatch: `proto f($x) { $x < 0 ?? die !! {*} }`.
-- The `proto` also fixes the routine's return-type and name for tools; individual
-  candidates fill in the behaviour — see [Multi dispatch](/subs/multi.html).
+  and gives the routine one signature (`(|)` here) that every candidate narrows.
+- The `proto` fixes the routine's name and shared signature; individual candidates
+  fill in the behaviour — see [Multi dispatch](/subs/multi.html).
+- In Rakudo the `{*}` may be surrounded by code that runs once before dispatch (to
+  validate or transform arguments); **Raku++ treats the `proto` as dispatch-only** and
+  does not run that surrounding code, so keep such logic inside the candidates.

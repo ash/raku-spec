@@ -27,6 +27,22 @@ OK
 `OK` stringifies to its name but carries `200` as its value — so it reads well *and*
 compares numerically.
 
+## Comparing and listing
+
+An enum value compares against its underlying number, and `.enums` gives back the
+whole name-to-value map.
+
+```raku
+enum HttpStatus (OK => 200, NotFound => 404);
+my $code = 404;
+say $code == NotFound;
+say HttpStatus.enums.sort;
+```
+```output
+True
+(NotFound => 404 OK => 200)
+```
+
 ## Notes
 
 - Names still work as bare terms and smartmatch in `when`; `$code == NotFound` is

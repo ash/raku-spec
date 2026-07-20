@@ -30,6 +30,39 @@ str hi
 The `42` matches the `Int` candidate, `"hi"` the `Str` one — chosen by the
 arguments' types, with no manual type-checking in the body.
 
+## Dispatch by arity
+
+Candidates can differ purely in how *many* parameters they take; the call's argument
+count picks one.
+
+```raku
+multi greet()   { "hello" }
+multi greet($n) { "hi $n" }
+say greet();
+say greet("Sam");
+```
+```output
+hello
+hi Sam
+```
+
+## Dispatch by value and where
+
+A candidate can match a literal value or a `where` predicate, which is how a recursive
+definition names its base case separately from the general one.
+
+```raku
+multi fac(0)                        { 1 }
+multi fac(Int $n where * > 0)       { $n * fac($n - 1) }
+say fac(5);
+```
+```output
+120
+```
+
+The call `fac(0)` matches the literal-`0` candidate; every positive `Int` matches the
+`where` candidate, which recurses down to it.
+
 ## Notes
 
 - Candidates can differ by arity (number of parameters), parameter types, or even

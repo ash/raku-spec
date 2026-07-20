@@ -34,6 +34,37 @@ say 10.sqrt;
 
 `abs` keeps the type (an `Int` stays an `Int`); `sqrt` returns a `Num`.
 
+## expmod — modular exponentiation
+
+`expmod(base, exp, mod)` computes `base ** exp mod mod` without ever building the
+huge intermediate power — the workhorse behind modular arithmetic and cryptography.
+
+```raku
+say expmod(2, 10, 1000);
+say 7.expmod(256, 13);
+```
+```output
+24
+9
+```
+
+`2 ** 10` is `1024`, so `mod 1000` is `24`; the method form `7.expmod(256, 13)` reads
+the base as the invocant.
+
+## narrow — the simplest exact type
+
+`.narrow` returns the value as the simplest type that still holds it exactly — an
+integral `Rat` collapses to `Int`, a genuine fraction stays a `Rat`.
+
+```raku
+say (6/3).narrow.^name;
+say (3/4).narrow.^name;
+```
+```output
+Int
+Rat
+```
+
 ## base — render in another radix
 
 `base(n)` renders an integer in radix `n` (2–36) as a string.

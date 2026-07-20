@@ -29,12 +29,43 @@ say (3 + 4i).abs;
 
 `(3 + 4i).abs` is `5` — the hypotenuse of the 3–4 right triangle.
 
+## Polar form
+
+`.polar` returns the number as a `(magnitude, angle)` pair — the magnitude is `.abs`,
+and the angle is measured in radians from the positive real axis.
+
+```raku
+my ($mag, $ang) = (3 + 4i).polar;
+say $mag;
+say $ang.round(0.0001);
+```
+```output
+5
+0.9273
+```
+
+## Arithmetic
+
+The usual operators work on `Complex` values directly, combining real and imaginary
+parts for you.
+
+```raku
+say (1 + 1i) * (1 + 1i);
+say (2 + 3i) + (1 - 1i);
+```
+```output
+0+2i
+3+2i
+```
+
+`(1 + 1i)²` is `0 + 2i` — the imaginary parts multiply to `-1`, cancelling the real
+part.
+
 ## Notes
 
-- `.polar` returns the `(magnitude, angle)` polar form; `.arg` gives just the angle
-  (in radians).
-- Complex arithmetic works with the usual operators, and functions like `sqrt` and
-  `exp` extend to `Complex`; taking `sqrt` of a *real* negative gives `NaN`, so use a
-  `Complex` (`(-1+0i).sqrt`) for the imaginary root.
+- `.re`/`.im` are the parts, `.conj` the conjugate, `.abs` the magnitude, and
+  `.polar` the `(magnitude, angle)` form.
 - The imaginary unit is the `i` postfix: `2i` is `0+2i` — see
   [Number forms](/literals/numbers.html).
+- `sqrt` extends to `Complex`, so `(1 + 0i).sqrt` is `1+0i`; taking `sqrt` of a real
+  negative (`(-1).sqrt`) gives `NaN`, so start from a `Complex` for an imaginary root.

@@ -24,6 +24,21 @@ say (1/3).FatRat.WHAT;
 The value is held exactly as a big numerator over `3`; `say` still rounds the
 *display* to six places, but the stored value is precise.
 
+## Exactly reversible
+
+Because nothing is lost to floating point, operations undo cleanly — a third times
+three is exactly one, not `0.9999…`.
+
+```raku
+my $f = (1/3).FatRat;
+say $f * 3;
+say $f * 3 == 1;
+```
+```output
+1
+True
+```
+
 ## Notes
 
 - Coerce into the type with `.FatRat`; arithmetic that mixes a `FatRat` with other

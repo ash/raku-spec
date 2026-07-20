@@ -23,6 +23,20 @@ say add5(10);
 
 `add5` is `add` with its first argument fixed at `5`, so `add5(10)` is `add(5, 10)`.
 
+## Currying into a pipeline
+
+Because the result is a plain `Callable`, a curried routine drops straight into `map`,
+`grep`, or a feed — a tidy way to specialise a general routine at the call site.
+
+```raku
+sub scale($factor, $x) { $factor * $x }
+my &double = &scale.assuming(2);
+say (1, 2, 3).map(&double);
+```
+```output
+(2 4 6)
+```
+
 ## Notes
 
 - `.assuming` works with named arguments too: `&f.assuming(:verbose)` fixes a named

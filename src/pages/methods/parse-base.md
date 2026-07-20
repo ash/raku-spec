@@ -23,6 +23,24 @@ say "101".parse-base(2);
 
 `"ff"` in base 16 is `255`; `"101"` in base 2 is `5`.
 
+## Round-trip with .base
+
+`.base` renders an `Int` into a radix string; `.parse-base` reads it back — the two
+are exact inverses.
+
+```raku
+say 255.base(16);
+say "FF".parse-base(16);
+say 42.base(2).parse-base(2);
+```
+```output
+FF
+255
+42
+```
+
+Rendering `42` to binary and parsing it back returns `42` unchanged.
+
 ## Notes
 
 - `.base` and `.parse-base` round-trip: `255.base(16)` is `"FF"` and

@@ -18,8 +18,24 @@ say "hello".samecase("AB");
 HELLO
 ```
 
-The pattern `"AB"` is all uppercase, so `hello` becomes `HELLO`; a mixed pattern like
-`"Ab"` would title-case instead.
+The pattern `"AB"` is all uppercase, so `hello` becomes `HELLO`.
+
+## Following a mixed pattern
+
+The case is copied position by position, and the *last* case in the pattern carries
+on to the rest of the string — so `"Ab"` gives an initial capital then lowercase.
+
+```raku
+say "world".samecase("Ab");
+say "WORLD".samecase("abc");
+```
+```output
+World
+world
+```
+
+`"Ab"` title-cases (`W` upper, the rest lower); `"abc"` is all lowercase, so `WORLD`
+becomes `world`.
 
 ## Notes
 

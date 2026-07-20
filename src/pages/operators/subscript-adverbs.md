@@ -27,6 +27,37 @@ True
 `:exists` reports the key is present; `:delete` removes `a` (returning its value `1`),
 leaving just `b`.
 
+## Shaping a slice — :kv / :p / :k
+
+On a slice, these adverbs choose what comes back: `:kv` the keys *and* values flat,
+`:p` them as pairs, `:k` just the keys.
+
+```raku
+my %h = a => 1, b => 2, c => 3;
+say %h<a b>:kv;
+say (%h<a c>:p).sort;
+say %h<a b>:k;
+```
+```output
+(a 1 b 2)
+(a => 1 c => 3)
+(a b)
+```
+
+## Deleting from an array
+
+`:delete` works on an array element too, returning what it held and leaving a hole.
+
+```raku
+my @a = 10, 20, 30;
+say @a[1]:delete;
+say @a;
+```
+```output
+20
+[10 (Any) 30]
+```
+
 ## Notes
 
 - `:exists` does **not** autovivify — testing `%h<missing>:exists` won't create the

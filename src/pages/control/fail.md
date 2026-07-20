@@ -26,6 +26,27 @@ nope
 `f()` returns rather than throwing, so `$r` is a defined-`False` Failure whose
 `.exception` carries the original message.
 
+## Consuming a Failure
+
+A caller that *checks* proceeds calmly. `try` catches the re-thrown exception so `//`
+can supply a default, and `with`/`else` branches on the Failure being undefined.
+
+```raku
+sub parse($s) { $s ~~ /^ \d+ $/ ?? +$s !! fail "not a number" }
+say (try parse("x")) // -1;
+say parse("42");
+with parse("nope") -> $v { say "ok $v" } else { say "handled" }
+```
+```output
+-1
+42
+handled
+```
+
+`parse("x")` fails, so `try …  // -1` yields the default; `parse("42")` returns the
+number normally; and the `with` block takes its `else` branch because the Failure is
+undefined.
+
 ## Notes
 
 - A `Failure` is "unthrown": checking it (`.defined`, `so $r`) is safe and returns
