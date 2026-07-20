@@ -118,6 +118,30 @@ sub inline(Str $text --> Str) {
     $body.subst(/ 'zXLINKXz' (\d+) 'zXENDXz' /, { @links[+$0] }, :g)
 }
 
+# Reduce a page's Markdown-ish body to plain searchable text: drop code-fence
+# markers (keep their content), heading hashes, list bullets, table pipes, and inline
+# markup, and collapse whitespace.
+sub index-body(Str $md --> Str) {
+    my @out;
+    for $md.lines -> $line {
+        next if $line.starts-with('```');
+        my $t = $line;
+        $t = $t.subst(/ ^ \s* '#'+ \s* /, '');
+        $t = $t.subst(/ ^ \s* <[\-*]> \s+ /, '');
+        $t = $t.subst(/ '[' (<-[ \] ]>+) ']' '(' <-[)]>* ')' /, { ~$0 }, :g);
+        $t = $t.subst('`', '', :g).subst('**', '', :g).subst('|', ' ', :g);
+        @out.push($t.trim);
+    }
+    @out.grep(*.chars).join(' ').subst(/ \s+ /, ' ', :g).trim
+}
+
+# Escape a string as a JSON string literal (quotes included).
+sub json-str(Str $s --> Str) {
+    my $e = $s.subst('\\', '\\\\', :g).subst('"', '\\"', :g)
+             .subst(/ \t /, ' ', :g).subst(/ \n /, ' ', :g);
+    '"' ~ $e ~ '"'
+}
+
 # Parse a fence info string like `raku run stdin="Ada\nGrace"` into (lang, %opts).
 sub parse-info(Str $info) {
     my $lang = $info.words ?? $info.words[0] !! '';
@@ -373,7 +397,10 @@ class Renderer {
 # ---------------------------------------------------------------------------
 
 sub nav-html(%site, %by-cat, $current) {
-    my @parts = '<nav class="sidebar"><a class="brand" href="/">Raku++ <span>spec</span></a>';
+    my @parts = '<nav class="sidebar"><a class="brand" href="/">Raku++ <span>spec</span></a>' ~
+        '<div class="site-search"><input type="search" placeholder="Search the spec…" ' ~
+        'aria-label="Search the spec" autocomplete="off" spellcheck="false">' ~
+        '<div class="ss-results" hidden></div></div>';
     for @(%site<categories>) -> %cat {
         my @cat-pages = @(%by-cat{ %cat<slug> } // []);
         next unless @cat-pages;   # hide categories with no pages yet
@@ -424,6 +451,7 @@ sub page-shell(%site, Str $title, Str $body, Str $nav, :$home = False --> Str) {
     </footer>
     </main>
     <script src="/theme/spec.js" defer></script>
+    <script src="/theme/search.js" defer></script>
     <script src="$engine"></script>
     </body>
     </html>
@@ -584,6 +612,17 @@ sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFA
         spurt($dest, render-page(%site, $p, $by-cat));
     }
     spurt('out/index.html', render-home(%site, $by-cat));
+
+    # Client-side search index: one {u,t,b} record per page, loaded by search.js.
+    my @entries;
+    for @($pages) -> $p {
+        my $u = "/{$p.category}/{$p.slug}.html";
+        my $b = ($p.summary ~ ' ' ~ index-body($p.body)).trim;
+        $b = $b.substr(0, 1800) if $b.chars > 1800;
+        @entries.push('{"u":' ~ json-str($u) ~ ',"t":' ~ json-str($p.title)
+                        ~ ',"b":' ~ json-str($b) ~ '}');
+    }
+    spurt('out/search-index.json', '[' ~ @entries.join(',') ~ ']');
 
     mkdir('out/theme');
     for dir('src/theme').grep({ .IO.f }) -> $asset {
