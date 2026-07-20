@@ -6,7 +6,7 @@ order: 48
 summary: Pull apart a complex number — real & imaginary parts, conjugate, magnitude.
 ---
 
-A `Complex` (see [Number forms](/literals/numbers.html)) carries a real and an
+A `Complex` (see [Number forms](/literals/numbers/)) carries a real and an
 imaginary part, and offers the usual methods to inspect and transform it.
 
 ## Parts, conjugate, magnitude
@@ -66,6 +66,6 @@ part.
 - `.re`/`.im` are the parts, `.conj` the conjugate, `.abs` the magnitude, and
   `.polar` the `(magnitude, angle)` form.
 - The imaginary unit is the `i` postfix: `2i` is `0+2i` — see
-  [Number forms](/literals/numbers.html).
+  [Number forms](/literals/numbers/).
 - `sqrt` extends to `Complex`, so `(1 + 0i).sqrt` is `1+0i`; taking `sqrt` of a real
   negative (`(-1).sqrt`) gives `NaN`, so start from a `Complex` for an imaginary root.

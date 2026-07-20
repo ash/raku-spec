@@ -76,5 +76,5 @@ say log(100, 10);
   significant digits, unlike a `Rat`.
 - Trigonometric functions (`sin`, `cos`, `tan` and their inverses) work in radians;
   `pi` and `tau` are there to convert.
-- For integer-flavoured operations see [Arithmetic operators](/operators/arithmetic.html)
+- For integer-flavoured operations see [Arithmetic operators](/operators/arithmetic/)
   (`div`, `mod`, `gcd`, `lcm`).

@@ -28,7 +28,7 @@ succeeds.
 > (or passing) an odd number should be a type-check failure (as in Rakudo) but is
 > currently accepted. The base type (`of Int`) *is* checked; only the `where` part is
 > skipped. Note this differs from a direct
-> [parameter `where` constraint](/subs/constraints.html), which *is* enforced.
+> [parameter `where` constraint](/subs/constraints/), which *is* enforced.
 
 ## Notes
 

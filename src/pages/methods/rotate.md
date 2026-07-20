@@ -28,5 +28,5 @@ front.
 - Nothing is lost — `rotate` is a permutation, so the result always has the same
   elements, just cyclically shifted.
 - The count wraps: `rotate(n)` on a list of length `L` is the same as `rotate(n % L)`.
-- Related reshapers: [`rotor`](/methods/list-reshape.html) (chunks/windows) and
+- Related reshapers: [`rotor`](/methods/list-reshape/) (chunks/windows) and
   `reverse` (flip); `rotate` alone shifts without reordering within the cycle.

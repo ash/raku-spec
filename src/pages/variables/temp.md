@@ -34,7 +34,7 @@ it for restoration, so later assignments inside the block are undone on exit.
 
 ## Restoring a dynamic variable across recursion
 
-`temp` shines with [dynamic variables](/variables/dynamic.html): each recursive call
+`temp` shines with [dynamic variables](/variables/dynamic/): each recursive call
 can bump a shared `$*` variable and have its own change unwound as it returns, so the
 value tracks the call depth exactly.
 

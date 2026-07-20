@@ -47,9 +47,9 @@ an animal that barks
 
 - `callsame` is one of a small family (`nextsame`, `callwith`, `nextwith`,
   `samewith`) for invoking the next candidate — see
-  [Re-dispatch](/subs/redispatch.html). You can also name the parent explicitly with
+  [Re-dispatch](/subs/redispatch/). You can also name the parent explicitly with
   `self.Animal::describe`.
 - Raku supports multiple inheritance (`is A is B`), but composing **roles** is
-  usually the better tool for sharing behaviour — see [Roles](/types/roles.html).
+  usually the better tool for sharing behaviour — see [Roles](/types/roles/).
 - Every class ultimately inherits from `Mu` (via `Any`), which is where universal
   methods like `.WHAT` and `.defined` come from.

@@ -44,4 +44,4 @@ say (3, 1, 2).minmax;
 - `.minmax` is one pass over the data — cheaper than calling `.min` and `.max`
   separately when you need both.
 - These pair with `.sort` (which takes the same key-extractor block) — see
-  [map / grep / sort](/builtins/higher-order.html).
+  [map / grep / sort](/builtins/higher-order/).

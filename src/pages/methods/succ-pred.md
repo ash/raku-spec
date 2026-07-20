@@ -47,7 +47,7 @@ aaa
 
 ## Notes
 
-- This is what drives string [ranges](/operators/ranges.html): `"a".."e"` walks the
+- This is what drives string [ranges](/operators/ranges/): `"a".."e"` walks the
   `.succ` sequence.
 - The carry propagates through the whole trailing alphanumeric run: `"a9".succ` is
   `"b0"` (the `9` wraps to `0` and carries into the `a`), the same odometer logic as

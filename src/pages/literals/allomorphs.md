@@ -73,7 +73,7 @@ True
 
 - The allomorph types are `IntStr`, `RatStr`, `NumStr`, and `ComplexStr` — one per
   numeric kind (`Int`, `Rat`, `Num`, `Complex`). See
-  [Number forms](/literals/numbers.html).
+  [Number forms](/literals/numbers/).
 - `<…>` only makes an allomorph when the word *is* numeric; `<hello>` is a plain
   `Str`, and a list like `<a 1 b>` mixes `Str` and `IntStr` elements.
 - Force just the number with a numeric coercion (`+$n` or `$n.Int`) or just the

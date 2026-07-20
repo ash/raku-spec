@@ -50,6 +50,6 @@ say ("a1b2c3" ~~ m:g/\d/).elems;
 
 - Adverbs stack: `m:i:g/…/` is both case-insensitive and global.
 - `:g` on a substitution (`s:g/…/…/`) replaces every occurrence — see
-  [Substitution](/regexes/substitution.html).
+  [Substitution](/regexes/substitution/).
 - Other useful ones: `:r` (ratchet, no backtracking — the default for `token`),
   `:x(n)` (match exactly n times), `:nth(k)`.

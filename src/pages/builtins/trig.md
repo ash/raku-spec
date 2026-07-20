@@ -81,4 +81,4 @@ say tanh(0);
 - Results are `Num` (floating point), so irrational values print in full precision;
   `.round(1e-9)` tidies a display without changing the maths.
 - For the polar/rectangular bridge, `cis(θ)` gives `cos θ + i·sin θ` as a `Complex` —
-  see [Complex methods](/methods/complex.html).
+  see [Complex methods](/methods/complex/).

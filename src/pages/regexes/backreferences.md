@@ -60,6 +60,6 @@ the
 - A backreference matches the *text* the capture holds, not the pattern that
   produced it — `(<[ab]>) $0` matches `aa` or `bb`, never `ab`.
 - The numbers follow the same rule as reading captures out: `$0`, `$1`, … in order
-  of opening parenthesis. See [Captures](/regexes/captures.html).
+  of opening parenthesis. See [Captures](/regexes/captures/).
 - Backreferences work with the positional captures `$0`, `$1`, …; to require a
   repeat of a *named* piece, capture it positionally and refer to it by number.

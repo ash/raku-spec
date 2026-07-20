@@ -63,4 +63,4 @@ say $z;
   `$str .= uc`. (On an `@array`, `@a .= reverse` reassigns it; Raku++ gists the
   result as `(…)` where Rakudo keeps `[…]` — a display difference.)
 - `//=` keys on definedness and `||=` on truth, mirroring the
-  [logical operators](/operators/logical.html).
+  [logical operators](/operators/logical/).

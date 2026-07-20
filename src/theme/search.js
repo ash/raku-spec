@@ -31,8 +31,8 @@
             u: d.u, t: d.t, b: d.b,
             tl: d.t.toLowerCase(), bl: d.b.toLowerCase(),
             ul: d.u.toLowerCase(),
-            seg: d.u.replace(/\.html$/, '').replace(/^.*\//, '').toLowerCase(),
-            depth: d.u.replace(/^\/|\.html$/g, '').split('/').length
+            seg: d.u.replace(/\/$/, '').replace(/^.*\//, '').toLowerCase(),
+            depth: d.u.replace(/^\/|\/$/g, '').split('/').length
           };
         });
         loading = false;
@@ -141,7 +141,7 @@
   }
 
   function crumb(u) {
-    return u.replace(/^\//, '').replace(/\.html$/, '').replace(/\//g, ' › ');
+    return u.replace(/^\/|\/$/g, '').replace(/\//g, ' › ');
   }
 
   // Position the panel as a fixed overlay under the input. It's re-parented to

@@ -43,5 +43,5 @@ say (1, 2, 3).map(&double);
   option while leaving the positionals open.
 - The result is an ordinary `Callable`, so it composes anywhere a block or sub is
   expected — `map`, `grep`, feeds, etc.
-- Currying pairs well with the [Whatever star](/operators/whatever.html): `* + 5` is a
+- Currying pairs well with the [Whatever star](/operators/whatever/): `* + 5` is a
   quick one-off curry, while `.assuming` curries an existing named routine.

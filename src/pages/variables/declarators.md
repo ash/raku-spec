@@ -62,4 +62,4 @@ say $Foo::bar;
   whereas Rakudo shows the immutable-`List` form `(2 3 5 7)` — a display difference
   only; the values are identical.
 - `state` is a fourth declarator — per-closure persistent storage — covered under
-  [State variables](/subs/state.html).
+  [State variables](/subs/state/).

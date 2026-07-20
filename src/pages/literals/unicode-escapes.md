@@ -42,4 +42,4 @@ say "\c[LATIN SMALL LETTER E WITH ACUTE]";
 - `\c[…]` also accepts a control-character name (`\c[TAB]`) and multiple
   comma-separated names in one escape.
 - The `uniname` method is the inverse — it gives a character's Unicode name; see
-  [Unicode & graphemes](/methods/unicode.html).
+  [Unicode & graphemes](/methods/unicode/).

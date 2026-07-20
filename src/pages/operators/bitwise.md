@@ -29,7 +29,7 @@ say 0b1100 +^ 0b1010;
 Reading the bits: `1100 +& 1010` keeps only bits set in *both* → `1000` (8); `+|`
 keeps bits set in *either* → `1110` (14); `+^` keeps bits set in exactly one →
 `0110` (6). The `0b…` literals are just a readable way to write the same integers
-(see [Integer literals](/literals/integers.html)).
+(see [Integer literals](/literals/integers/)).
 
 ## Shifting
 

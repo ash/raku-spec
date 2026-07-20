@@ -25,7 +25,7 @@ say $x;
 ## do a conditional
 
 `do if … else …` turns a two-way branch into a value — an alternative to the
-[ternary](/operators/ternary.html) when the branches are blocks.
+[ternary](/operators/ternary/) when the branches are blocks.
 
 ```raku
 my $y = do if 3 > 2 { "yes" } else { "no" }

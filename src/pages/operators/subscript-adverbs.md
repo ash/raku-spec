@@ -66,4 +66,4 @@ say @a;
   returns what it removed.
 - The value-shape adverbs pair with slices: `%h<a b>:kv` gives `(a 1 b 2)`, `:p` gives
   pairs, `:k` just the keys that matched — the same family used by
-  [grep/first :k](/methods/list-indexed.html).
+  [grep/first :k](/methods/list-indexed/).

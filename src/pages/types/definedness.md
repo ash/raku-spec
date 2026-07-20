@@ -46,7 +46,7 @@ True
 
 - Definedness ≠ truth: `0` and `""` are **defined but false**, which is exactly why
   `//` (defined-or) and `with` differ from `||` and `if` — see
-  [Logical operators](/operators/logical.html).
+  [Logical operators](/operators/logical/).
 - A parameter typed `Int:D` requires a *defined* Int; `Int:U` requires the undefined
   type object — the `:D`/`:U` "definedness smileys".
 - Type objects are how Raku represents "no value of this type yet", replacing null

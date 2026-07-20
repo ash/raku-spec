@@ -49,7 +49,7 @@ say &area.signature.params.map(*.name);
 ## Notes
 
 - `.^name` (the type's name) is fully supported — see
-  [The type tower & introspection](/types/introspection.html); `.^parents` gives the
+  [The type tower & introspection](/types/introspection/); `.^parents` gives the
   immediate superclasses.
 - `.isa` tests strict **class** inheritance (`5.isa(Numeric)` is `False`, since
   `Numeric` is a role) — use `~~` for role/type membership.

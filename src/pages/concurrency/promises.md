@@ -13,7 +13,7 @@ thread and hands back a `Promise`, `await` waits for results, and `react`/`whene
 consume asynchronous `Supply` streams. These run in the Raku++ interpreter and the
 `--exe` native binary, matching Rakudo — but the in-browser playground is
 single-threaded, so the examples here are shown with their verified output rather than
-a Run button (see [Execution modes](/conformance.html) for why).
+a Run button (see [Execution modes](/conformance/) for why).
 
 ## start and await
 

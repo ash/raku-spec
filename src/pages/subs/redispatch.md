@@ -97,8 +97,8 @@ say fac(5);
 
 - `callsame`/`nextsame` take no arguments (they reuse the current `@_`); `callwith`/
   `nextwith` take the new argument list.
-- These work in method overrides ([Inheritance](/types/inheritance.html)) and in
-  `multi` chains ([Multi dispatch](/subs/multi.html)) alike — same routines, same
+- These work in method overrides ([Inheritance](/types/inheritance/)) and in
+  `multi` chains ([Multi dispatch](/subs/multi/)) alike — same routines, same
   rules.
 - `samewith` differs from `callwith`: `callwith` runs the *next* candidate, while
   `samewith` re-runs dispatch from scratch — so it can land back on the current

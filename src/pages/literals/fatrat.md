@@ -6,7 +6,7 @@ order: 28
 summary: A rational whose numerator and denominator grow without bound.
 ---
 
-A `FatRat` is like a [`Rat`](/literals/rationals.html) but with no limit on the size
+A `FatRat` is like a [`Rat`](/literals/rationals/) but with no limit on the size
 of its denominator. Where a `Rat` degrades to floating point once its denominator
 outgrows a machine word, a `FatRat` stays exact however large the parts become.
 

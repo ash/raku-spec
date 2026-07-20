@@ -42,4 +42,4 @@ say "hello".indices("l");
   `.contains(/\d/)` tests for any digit.
 - `.index` returns the first position (or `Nil`); `.rindex` searches from the end.
 - For extracting the matched pieces rather than testing, use `.comb` or a regex
-  match — see [String methods](/methods/string.html).
+  match — see [String methods](/methods/string/).

@@ -57,7 +57,7 @@ say (1..Inf).first(* > 1000);
 
 ## Self-referential sequences
 
-The sequence operator `...` (see [The sequence operator](/operators/sequence.html))
+The sequence operator `...` (see [The sequence operator](/operators/sequence/))
 builds a lazy series from a closure — even one that reads its own earlier terms, like
 Fibonacci — and you take a prefix the same way.
 
@@ -76,7 +76,7 @@ say fib[^10];
 - Indexing (`@a[100]`), `.head(n)`, `.first`, and `for` all pull lazily; `.elems`,
   `.sort`, `.reverse`, and `say @a` (the whole list) force evaluation.
 - Ranges (`1..Inf`) and the sequence operator (`1, 2, 4 ... *`) are the common lazy
-  sources; `gather`/`take` ([gather / take](/control/gather-take.html)) produces
+  sources; `gather`/`take` ([gather / take](/control/gather-take/)) produces
   values on demand too.
 - `.head`/`.tail` and slices are the safe way to look at an infinite list — printing
   the whole thing would never finish.

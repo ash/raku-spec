@@ -8,7 +8,7 @@ summary: Index an array or hash with several keys at once to get several values.
 
 Subscripting with a **list** of keys returns a list of values — a *slice*. It works
 on arrays (by position) and hashes (by key), and the index list can itself be a range
-or use the [Whatever star](/operators/whatever.html).
+or use the [Whatever star](/operators/whatever/).
 
 ## Array slices
 

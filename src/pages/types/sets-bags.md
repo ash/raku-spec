@@ -8,7 +8,7 @@ summary: Immutable collections — a Set of distinct elements, a Bag with counts
 
 A `Set` is an unordered collection of distinct elements; a `Bag` is the same but
 keeps a **count** of each. Both are immutable and pair with the
-[set operators](/operators/set-ops.html).
+[set operators](/operators/set-ops/).
 
 ## Set — distinct elements
 

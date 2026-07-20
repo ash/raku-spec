@@ -53,8 +53,8 @@ rejected
 ## Notes
 
 - `where` is also how `subset` types narrow a base type — see
-  [Subsets](/types/subsets.html).
-- For dispatch, a `where` on a [multi](/subs/multi.html) candidate is how you route
+  [Subsets](/types/subsets/).
+- For dispatch, a `where` on a [multi](/subs/multi/) candidate is how you route
   on a value (e.g. a `0` case vs the general case).
 - A passing constraint has zero runtime cost beyond evaluating the predicate once per
   call.

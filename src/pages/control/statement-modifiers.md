@@ -53,8 +53,8 @@ say $i;
 ## Notes
 
 - Modifiers don't nest and take no `else` — reach for the block forms
-  ([if / unless / with](/control/conditionals.html),
-  [loops](/control/loops.html)) when you need more than one clause.
+  ([if / unless / with](/control/conditionals/),
+  [loops](/control/loops/)) when you need more than one clause.
 - The postfix `for` topicalises `$_`, exactly like the block `for`, so
   `.say for @items` is the compact "print each" idiom.
 - Precedence is loose, so the whole statement to the left is the body:

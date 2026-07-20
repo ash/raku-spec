@@ -6,7 +6,7 @@ order: 25
 summary: Infix operators that pick the smaller or larger value, and compare with tolerance.
 ---
 
-Besides the `.min`/`.max` [methods](/methods/minmax.html), `min` and `max` are also
+Besides the `.min`/`.max` [methods](/methods/minmax/), `min` and `max` are also
 **infix operators** that return the lesser or greater of two values. `≅`
 (approximately-equal) compares with a small tolerance — useful for floating point.
 
@@ -46,6 +46,6 @@ False
   while the methods reduce a whole list.
 - `≅` matters for `Num` (floating point); exact `Rat` arithmetic (like `0.1 + 0.2`)
   is already exactly `0.3`, so there `==` suffices — see
-  [Rational literals](/literals/rationals.html).
+  [Rational literals](/literals/rationals/).
 - There are matching `minmax` reductions: `[min] @xs` and `[max] @xs` fold a list to
-  its extreme with the [reduction metaoperator](/operators/reductions.html).
+  its extreme with the [reduction metaoperator](/operators/reductions/).

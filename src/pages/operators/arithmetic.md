@@ -7,7 +7,7 @@ summary: The numeric infixes — + - * / % ** div mod — and the types they ret
 ---
 
 The arithmetic operators work across the whole numeric tower. Division of integers
-yields an exact `Rat` (see [Rational literals](/literals/rationals.html)), not a
+yields an exact `Rat` (see [Rational literals](/literals/rationals/)), not a
 truncated integer.
 
 ## The basic set

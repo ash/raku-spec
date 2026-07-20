@@ -58,4 +58,4 @@ say $b();
 - The capture is by *reference* to the container, not a copy of the value — that is
   why `$n++` inside the block is visible on the next call.
 - To keep per-call state *inside* a single sub rather than a returned closure, use a
-  [state variable](/subs/state.html).
+  [state variable](/subs/state/).

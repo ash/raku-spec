@@ -13,7 +13,7 @@ and `chop` removes trailing characters.
 ## One-sided trimming
 
 `.trim-leading` strips leading whitespace; `.trim-trailing` strips trailing. (`.trim`
-does both — see [String methods](/methods/string.html).)
+does both — see [String methods](/methods/string/).)
 
 ```raku
 say "  hi  ".trim-leading ~ "|";

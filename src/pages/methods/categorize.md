@@ -28,7 +28,7 @@ say %g<small>.sort;
 
 ## Notes
 
-- `classify` ([List methods](/methods/list.html)) is the single-key form — its block
+- `classify` ([List methods](/methods/list/)) is the single-key form — its block
   returns one key, so each element lands in exactly one group.
 - The result is a hash of arrays; iterate it with `.sort` for reproducible output
   (hash order is undefined).

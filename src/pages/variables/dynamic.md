@@ -46,7 +46,7 @@ outer
 
 The first `greet()` runs while the inner `$*g` is in effect, so it prints `inner`; the
 second runs after the block, seeing `outer` again. (For an automatic restore without a
-new lexical scope, use [`temp`](/variables/temp.html).)
+new lexical scope, use [`temp`](/variables/temp/).)
 
 ## Notes
 

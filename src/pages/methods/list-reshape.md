@@ -37,7 +37,7 @@ say (1..5).rotor(2 => -1);
 
 ## Triangular reduce — running totals
 
-`[\op]` is the scan form of the [reduction metaoperator](/operators/reductions.html):
+`[\op]` is the scan form of the [reduction metaoperator](/operators/reductions/):
 it keeps every intermediate result, not just the final one.
 
 ```raku

@@ -50,6 +50,6 @@ say f(5);
 - `state` differs from `my`: a `my` variable is re-created (and re-initialised)
   every call, whereas a `state` variable is created once per closure and remembered.
 - Each closure gets its own `state` storage — two clones of the same block do not
-  share it, just as with [closures](/subs/closures.html).
+  share it, just as with [closures](/subs/closures/).
 - The one-time initialiser makes `state $cache = expensive()` a tidy memoisation
   idiom.

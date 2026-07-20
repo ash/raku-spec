@@ -42,7 +42,7 @@ becomes `world`.
 - It's handy for preserving the casing of a word you're substituting — recase the
   replacement to `.samecase` the original.
 - Related case methods (`.uc`, `.lc`, `.tc`, `.tclc`) are on the
-  [Case methods](/methods/case.html) page; `.samecase` differs by taking its casing
+  [Case methods](/methods/case/) page; `.samecase` differs by taking its casing
   from another string rather than a fixed rule.
 - `.indent(n)` is a related layout method — it adds `n` leading spaces to each line
   (a negative `n` removes indentation).

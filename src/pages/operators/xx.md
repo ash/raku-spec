@@ -27,7 +27,7 @@ say @a;
 
 ## Notes
 
-- Compare with [string repetition `x`](/operators/string-ops.html): `"ab" x 3` is
+- Compare with [string repetition `x`](/operators/string-ops/): `"ab" x 3` is
   `"ababab"`, while `"ab" xx 3` is `("ab", "ab", "ab")`.
 - The left side is re-evaluated each time if it's a block, so `{ rand } xx 3` gives
   three different numbers — handy for generating a list of computed values.

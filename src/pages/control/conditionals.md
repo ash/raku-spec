@@ -67,7 +67,7 @@ no value
 ## Notes
 
 - All of these are expressions in statement position; for a value-returning choice
-  inside an expression use the [ternary](/operators/ternary.html) `?? !!`.
+  inside an expression use the [ternary](/operators/ternary/) `?? !!`.
 - The postfix forms — `say $x if $cond`, `... unless ...`, `... with ...` — read
   well for one-line guards.
 - `with 0 { }` **runs**: `0` is defined even though it is false. That is the whole

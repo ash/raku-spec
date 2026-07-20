@@ -32,7 +32,7 @@ narrows it, and `{*}` hands off to the one that fits.
 - A `proto` is optional — a bare set of `multi`s works — but it documents the family
   and gives the routine one signature (`(|)` here) that every candidate narrows.
 - The `proto` fixes the routine's name and shared signature; individual candidates
-  fill in the behaviour — see [Multi dispatch](/subs/multi.html).
+  fill in the behaviour — see [Multi dispatch](/subs/multi/).
 - In Rakudo the `{*}` may be surrounded by code that runs once before dispatch (to
   validate or transform arguments); **Raku++ treats the `proto` as dispatch-only** and
   does not run that surrounding code, so keep such logic inside the candidates.

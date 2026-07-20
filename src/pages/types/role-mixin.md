@@ -6,7 +6,7 @@ order: 35
 summary: Add a role to a single object at runtime with `but`, and require methods with a stub.
 ---
 
-Beyond composing roles into a class ([Roles](/types/roles.html)), a role can be mixed
+Beyond composing roles into a class ([Roles](/types/roles/)), a role can be mixed
 into **one object** at runtime, and a role can **require** the composing class to
 supply a method.
 

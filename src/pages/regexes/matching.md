@@ -43,4 +43,4 @@ True
 - Bare identifiers in a regex match **literally** only when quoted (`'ell'`) or via
   a subrule; unquoted `\w`, `\d`, etc. are metacharacters.
 - A successful match also sets the `$/` "match variable" in the current scope,
-  which the capture syntax reads from — see [Captures](/regexes/captures.html).
+  which the capture syntax reads from — see [Captures](/regexes/captures/).

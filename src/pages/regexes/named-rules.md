@@ -45,7 +45,7 @@ hello
 - `<name>` both matches the subrule and captures it; use `<.name>` to match without
   capturing.
 - Subrules can call other subrules, which is exactly how a
-  [grammar](/regexes/grammars.html) is built — a grammar is a named collection of
+  [grammar](/regexes/grammars/) is built — a grammar is a named collection of
   these rules.
 - A lexical `my token`/`my regex` shadows a built-in subrule of the same name
   (`<ws>`, `<alpha>`, …), so `<ident>` uses *your* definition inside the scope.

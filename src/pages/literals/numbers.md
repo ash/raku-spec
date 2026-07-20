@@ -54,6 +54,6 @@ say (1+1i) * (1-1i);
 - `1e0` is the idiomatic way to write "the floating-point one" and to force a value
   into `Num` context.
 - `Num` is inexact — prefer `Rat` (a plain decimal like `0.1`) when you need exact
-  arithmetic; see [Rational literals](/literals/rationals.html).
+  arithmetic; see [Rational literals](/literals/rationals/).
 - The numeric tower is `Int` ⊂ `Rat` ⊂ `Num` ⊂ `Complex`; operations promote to the
   widest type involved.

@@ -81,9 +81,9 @@ FF
 ## Notes
 
 - `.Int`, `.Rat`, `.Num`, and `.Complex` move a number through the
-  [numeric tower](/literals/numbers.html); `.narrow` picks the simplest type that
+  [numeric tower](/literals/numbers/); `.narrow` picks the simplest type that
   holds the value exactly.
 - Rounding methods (`.floor`, `.ceiling`, `.round`, `.truncate`) live on
-  [Rounding](/builtins/rounding.html).
+  [Rounding](/builtins/rounding/).
 - `.chr` turns a codepoint number into its character (`65.chr` is `A`), the inverse
   of `.ord` on a string.

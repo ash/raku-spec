@@ -60,7 +60,7 @@ x
 ## Notes
 
 - `CATCH` matches with `when`/`default` (smartmatch), so you can branch on exception
-  type or message — see [Typed exceptions](/control/typed-exceptions.html).
+  type or message — see [Typed exceptions](/control/typed-exceptions/).
 - A `CATCH` that handles the exception lets the enclosing block **continue** past it,
   rather than propagating — the basis of resumable, per-iteration recovery.
 - `die` with a non-string argument throws that object directly; `die` with a string

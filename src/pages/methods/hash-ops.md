@@ -46,7 +46,7 @@ Map
 
 - `.push` differs from assignment: `%h<a> = 2` *replaces*, while `%h.push("a" => 2)`
   *accumulates* into an array once there's more than one value.
-- `classify` (see [List methods](/methods/list.html)) is the higher-level grouping
+- `classify` (see [List methods](/methods/list/)) is the higher-level grouping
   tool built on this idea.
 - `%h.kv`, `%h.pairs`, `%h.keys`, `%h.values` iterate a hash — see
-  [Hash methods](/methods/hash.html).
+  [Hash methods](/methods/hash/).

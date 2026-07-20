@@ -7,7 +7,7 @@ summary: Map whole ranges of characters at once — upcasing, rot13, and the lik
 ---
 
 `.trans` translates characters by a mapping. Beyond single characters (see
-[String methods](/methods/string.html)), the two sides can be **ranges**, so a
+[String methods](/methods/string/)), the two sides can be **ranges**, so a
 whole alphabet maps in one go — the `tr///` of other languages, generalised.
 
 ## Range-to-range mapping

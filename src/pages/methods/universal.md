@@ -80,5 +80,5 @@ say &f.count;
 - `.gist` is the human-readable form `say`/`put` use; `.Str` is the plain string
   coercion. All three come from `Mu`.
 - `.WHAT` (type object) and `.defined` are also universal — see
-  [The type tower](/types/introspection.html) and
-  [Definedness](/types/definedness.html).
+  [The type tower](/types/introspection/) and
+  [Definedness](/types/definedness/).

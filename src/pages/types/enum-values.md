@@ -6,7 +6,7 @@ order: 45
 summary: Assign chosen underlying values to enum names instead of the 0,1,2 default.
 ---
 
-Beyond the counting-from-zero default ([Enums](/types/enums.html)), an enum can pin
+Beyond the counting-from-zero default ([Enums](/types/enums/)), an enum can pin
 each name to a **chosen** value with a list of pairs — ideal for codes like HTTP
 statuses or bit flags.
 

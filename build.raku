@@ -477,7 +477,7 @@ sub nav-html(%site, %by-cat, $current) {
             "<div class=\"nav-cat-body\"><ul>");
         for @cat-pages -> $p {
             my $active = ($current.defined && $p === $current) ?? ' class="active"' !! '';
-            @parts.push("<li><a$active href=\"/{$p.category}/{$p.slug}.html\">{esc($p.title)}</a></li>");
+            @parts.push("<li><a$active href=\"/{$p.category}/{$p.slug}/\">{esc($p.title)}</a></li>");
         }
         @parts.push('</ul></div></div>');
     }
@@ -548,8 +548,8 @@ sub render-conformance(%site, %by-cat --> Str) {
     <p class="conf-modes-intro">This is a reference for <strong>Raku++</strong> — the
     interpreter. A program can run three ways, and every example here is verified to give
     the same output in all three; the few features that need capabilities the browser
-    sandbox lacks (<a href="/concurrency/promises.html">concurrency</a>,
-    <a href="/builtins/io.html">IO</a>, deep recursion) are marked on their pages.</p>
+    sandbox lacks (<a href="/concurrency/promises/">concurrency</a>,
+    <a href="/builtins/io/">IO</a>, deep recursion) are marked on their pages.</p>
     <div class="table-wrap"><table class="conf-modes-tbl">
       <thead><tr><th>Mode</th><th>How to run</th><th>Threads</th><th>Files &amp; IO</th><th>Deep recursion</th></tr></thead>
       <tbody>
@@ -633,7 +633,7 @@ sub render-home(%site, %by-cat --> Str) {
         "<p class=\"tagline\">{esc(%site<tagline>)}</p>" ~
         "<p class=\"hero-stats\">$features features across $pages pages · " ~
         "every example verified against Raku++, Rakudo, and the in-browser engine</p>" ~
-        "<p class=\"hero-links\"><a href=\"/conformance.html\">See the full Roast conformance map →</a></p>" ~
+        "<p class=\"hero-links\"><a href=\"/conformance/\">See the full Roast conformance map →</a></p>" ~
         '</div>';
 
     # Status legend.
@@ -654,7 +654,7 @@ sub render-home(%site, %by-cat --> Str) {
         for @pages -> $p {
             my ($label, $cls, $) = @(%STATUS{ $p.status });
             @parts.push(
-                "<li><a href=\"/{$p.category}/{$p.slug}.html\" title=\"{esc-attr($p.summary)}\">" ~
+                "<li><a href=\"/{$p.category}/{$p.slug}/\" title=\"{esc-attr($p.summary)}\">" ~
                 "<span class=\"dot $cls\" title=\"{$label}\"></span>{esc($p.title)}</a></li>");
         }
         @parts.push('</ul></section>');
@@ -788,23 +788,25 @@ sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFA
     $VERSION = asset-version();
     my ($pages, $by-cat) = collect-pages(%site);
 
+    # Clean URLs: each page is <cat>/<slug>/index.html, served at /<cat>/<slug>/
+    # (no .html extension). mkdir creates parent dirs too.
     for @($pages) -> $p {
-        my $dest = "out/{$p.category}/{$p.slug}.html";
-        mkdir("out/{$p.category}");
-        spurt($dest, render-page(%site, $p, $by-cat));
+        mkdir("out/{$p.category}/{$p.slug}");
+        spurt("out/{$p.category}/{$p.slug}/index.html", render-page(%site, $p, $by-cat));
     }
     spurt('out/index.html', render-home(%site, $by-cat));
 
     # Roast conformance map (special page + its committed data snapshot).
     if 'src/data/roast-map.json'.IO.e {
-        spurt('out/conformance.html', render-conformance(%site, $by-cat));
+        mkdir('out/conformance');
+        spurt('out/conformance/index.html', render-conformance(%site, $by-cat));
         spurt('out/roast-map.json', slurp('src/data/roast-map.json'));
     }
 
     # Client-side search index: one {u,t,b} record per page, loaded by search.js.
     my @entries;
     for @($pages) -> $p {
-        my $u = "/{$p.category}/{$p.slug}.html";
+        my $u = "/{$p.category}/{$p.slug}/";
         my $b = ($p.summary ~ ' ' ~ index-body($p.body)).trim;
         # Cap generously so every term on a page stays searchable (the old 1800
         # limit truncated longer pages, hiding tail content like `samewith` from

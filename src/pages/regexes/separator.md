@@ -44,4 +44,4 @@ say $<num>.map(~*).join("|");
 - The separator is any regex atom — a literal, a character class, or `\s*` for
   optional surrounding whitespace.
 - This is the idiomatic way to write list rules in a
-  [grammar](/regexes/grammars.html): `rule list { <item>+ % ',' }`.
+  [grammar](/regexes/grammars/): `rule list { <item>+ % ',' }`.

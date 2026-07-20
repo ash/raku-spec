@@ -56,7 +56,7 @@ say 0.1 + 0.2;
 | `(1/3) * 3`     | `1` (exact)        | `0.9999999999999999`  |
 
 > To opt into floating point, write a number in scientific notation (`1e0`) or
-> coerce with `.Num`. See [Number literals](/literals/numbers.html) once written.
+> coerce with `.Num`. See [Number literals](/literals/numbers/) once written.
 
 ## Notes
 

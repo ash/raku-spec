@@ -87,6 +87,6 @@ say IntBox.new(items => [1, 2, 3]).count;
 - A required method (the `{ ... }` stub) documents the interface a consumer must
   satisfy; provide it in the composing class as shown above.
 - Roles can also be applied to a single object at runtime with `$obj does SomeRole` —
-  see [Runtime mixins](/types/role-mixin.html).
+  see [Runtime mixins](/types/role-mixin/).
 - A role used where a class is expected (`my Speaker $x`) acts as a type constraint,
   so roles double as interfaces for typing.

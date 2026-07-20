@@ -50,5 +50,5 @@ True
 - The `.^name` method is a *metamethod* (the `.^` calls into the metaobject); the
   metaobject is also where `.^methods`, `.^attributes`, and `.^mro` live.
 - Numeric types form a tower `Int` ⊂ `Rat`/`FatRat` ⊂ `Num` ⊂ `Complex`, all doing
-  the `Numeric` role — see [Rational literals](/literals/rationals.html) for how
+  the `Numeric` role — see [Rational literals](/literals/rationals/) for how
   values move through it.

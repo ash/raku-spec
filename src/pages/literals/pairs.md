@@ -43,7 +43,7 @@ name => Ada
 ## Notes
 
 - `:$var` is shorthand for `var => $var` — the pattern behind
-  [named arguments](/subs/named.html).
-- A list of Pairs is what initialises a [hash](/variables/sigils.html):
+  [named arguments](/subs/named/).
+- A list of Pairs is what initialises a [hash](/variables/sigils/):
   `my %h = a => 1, b => 2`.
 - `:!key` is `key => False`, the negated colon-pair — common for turning a flag off.
