@@ -416,11 +416,12 @@ class Renderer {
 # ---------------------------------------------------------------------------
 
 sub nav-html(%site, %by-cat, $current) {
-    my @parts = '<nav class="sidebar"><a class="brand" href="/">Raku++ <span>spec</span></a>' ~
+    my @parts = '<nav class="sidebar"><div class="sidebar-head">' ~
+        '<a class="brand" href="/">Raku++ <span>spec</span></a>' ~
         '<div class="site-search"><input type="search" placeholder="Search the spec…" ' ~
         'aria-label="Search the spec" autocomplete="off" spellcheck="false">' ~
         '<span class="ss-hint" aria-hidden="true">/</span>' ~
-        '<div class="ss-results" hidden></div></div>';
+        '<div class="ss-results" hidden></div></div></div><div class="sidebar-nav">';
     for @(%site<categories>) -> %cat {
         my @cat-pages = @(%by-cat{ %cat<slug> } // []);
         next unless @cat-pages;   # hide categories with no pages yet
@@ -431,7 +432,7 @@ sub nav-html(%site, %by-cat, $current) {
         }
         @parts.push('</ul></div>');
     }
-    @parts.push('</nav>');
+    @parts.push('</div></nav>');
     @parts.join
 }
 

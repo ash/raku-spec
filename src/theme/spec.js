@@ -16,15 +16,16 @@
     });
   }
 
-  // Scroll the sidebar (not the page) so the current page's entry — and its
-  // siblings in the same section — are in view on load.
-  var active = nav && nav.querySelector('a.active');
-  if (active && nav) {
+  // Scroll the nav list (not the page, and not the pinned head) so the current
+  // page's entry — and its siblings in the same section — are in view on load.
+  var scroller = document.querySelector('.sidebar-nav');
+  var active = scroller && scroller.querySelector('a.active');
+  if (active && scroller) {
     var a = active.getBoundingClientRect();
-    var n = nav.getBoundingClientRect();
+    var n = scroller.getBoundingClientRect();
     // Only adjust when the active item isn't already comfortably visible.
     if (a.top < n.top + 8 || a.bottom > n.bottom - 8) {
-      nav.scrollTop += (a.top - n.top) - (nav.clientHeight - active.offsetHeight) / 2;
+      scroller.scrollTop += (a.top - n.top) - (scroller.clientHeight - active.offsetHeight) / 2;
     }
   }
 })();
