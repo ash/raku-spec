@@ -20,6 +20,11 @@
 # --rakupp=PATH (deploy.sh pins the exact build via .deploy.env).
 constant RAKUPP-DEFAULT = 'rakupp';
 
+# Cache-busting tag stamped onto theme assets (?v=…), set once per build from a
+# content hash of all sources — so browsers refetch base.css/spec.js/search.js and
+# the search index exactly when their content changes.
+my $VERSION = '';
+
 # status key => (label, css-class, tooltip)
 my %STATUS =
     full      => ('Full',            'st-full', 'Implemented; behaves as documented.'),
@@ -140,6 +145,20 @@ sub json-str(Str $s --> Str) {
     my $e = $s.subst('\\', '\\\\', :g).subst('"', '\\"', :g)
              .subst(/ \t /, ' ', :g).subst(/ \n /, ' ', :g);
     '"' ~ $e ~ '"'
+}
+
+# 8-char content hash over every source (theme + pages + config) — the cache tag.
+sub asset-version(--> Str) {
+    my @files = dir('src/theme').grep({ .IO.f }).map(*.Str);
+    for dir('src/pages').grep({ .IO.d }).sort -> $cat {
+        @files.append: dir($cat).grep({ .IO.f && .Str.ends-with('.md') }).map(*.Str);
+    }
+    @files.push('src/site.raku');
+    my $blob = @files.sort.map({ slurp($_) }).join;
+    my $p = run('md5', '-q', :in, :out);
+    $p.in.print($blob);
+    $p.in.close;
+    $p.out.slurp(:close).trim.substr(0, 8)
 }
 
 # Parse a fence info string like `raku run stdin="Ada\nGrace"` into (lang, %opts).
@@ -428,7 +447,7 @@ sub page-shell(%site, Str $title, Str $body, Str $nav, :$home = False --> Str) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{esc($title)}</title>
     <script>{$THEME-SCRIPT}</script>
-    <link rel="stylesheet" href="/theme/base.css">
+    <link rel="stylesheet" href="/theme/base.css?v={$VERSION}">
     </head>
     <body class="$body-class">
     <button class="nav-toggle" aria-label="Menu">☰</button>
@@ -450,8 +469,8 @@ sub page-shell(%site, Str $title, Str $body, Str $nav, :$home = False --> Str) {
     <span>Examples run live in your browser via WebAssembly. <a href="$repo">Source</a>.</span>
     </footer>
     </main>
-    <script src="/theme/spec.js" defer></script>
-    <script src="/theme/search.js" defer></script>
+    <script src="/theme/spec.js?v={$VERSION}" defer></script>
+    <script src="/theme/search.js?v={$VERSION}" defer></script>
     <script src="$engine"></script>
     </body>
     </html>
@@ -604,6 +623,7 @@ sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFA
     }
     mkdir('out');
 
+    $VERSION = asset-version();
     my ($pages, $by-cat) = collect-pages(%site);
 
     for @($pages) -> $p {

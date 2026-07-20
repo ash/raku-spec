@@ -6,7 +6,10 @@
    opens, Esc clears. Adapted from the raku-course search. */
 (function () {
   'use strict';
-  var INDEX_URL = '/search-index.json';
+  // Bust the index with the same cache tag stamped on this script's URL.
+  var me = document.querySelector('script[src*="/theme/search.js"]');
+  var VER = me ? (me.src.split('?v=')[1] || '') : '';
+  var INDEX_URL = '/search-index.json' + (VER ? '?v=' + VER : '');
   var docs = null, loading = false, loadErr = false, waiters = [];
   var box, input, panel, results = [], sel = -1, debounce;
 
