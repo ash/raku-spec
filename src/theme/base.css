@@ -434,6 +434,8 @@ body.home .content { max-width: 66rem; }
 .conf-denom-note { color: var(--muted); font-variant-numeric: normal; }
 @media (max-width: 640px) { .conf-denom-note { display: none; } }
 
+.conf-source { font-size: .85rem; color: var(--muted); margin: 0 0 .5rem; }
+
 .conf-areas-title { font-size: 1.1rem; margin: 1.5rem 0 .3rem; }
 .conf-areas-title span { color: var(--muted); font-weight: 400; font-size: .9rem; }
 

@@ -6,6 +6,7 @@
     engine     => 'https://raku.online/raku.js',
     playground => 'https://raku.online/',
     repo       => 'https://github.com/ash/raku-spec',
+    rakupp     => 'https://github.com/ash/rakupp',   # the interpreter's own repo/docs
 
     # Order and display titles for the categories under src/pages/.
     # (Categories with no pages yet are simply hidden until filled in.)

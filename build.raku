@@ -504,6 +504,10 @@ sub render-conformance(%site, %by-cat --> Str) {
       the official Raku specification test suite — the same tests this spec is verified against.</p>
       <div class="conf-hero" id="conf-hero"></div>
       <div class="conf-denoms" id="conf-denoms"></div>
+      <p class="conf-source">Counts and methodology come from Raku++'s own Roast run —
+      see <a href="RAKUPP_REPO/blob/main/docs/ROAST.md">ROAST.md</a> (standing &amp;
+      per-synopsis breakdown) and <a href="RAKUPP_REPO/blob/main/docs/COUNTING.md">COUNTING.md</a>
+      (exact definition of every figure).</p>
     </div>
     <h2 class="conf-areas-title">By synopsis <span>— tests that ran, per area</span></h2>
     <div class="conf-controls">
@@ -512,6 +516,7 @@ sub render-conformance(%site, %by-cat --> Str) {
     </div>
     <div class="conf-table" id="conf-table" aria-live="polite">Loading the conformance map…</div>
     BODY
+    $body = $body.subst('RAKUPP_REPO', esc-attr(%site<rakupp>), :g);
     my $extra = "<script src=\"/theme/conformance.js?v={$VERSION}\" defer></script>";
     page-shell(%site, 'Roast conformance — Raku++ Specification', $body,
                nav-html(%site, %by-cat, Nil), :extra-scripts($extra))
