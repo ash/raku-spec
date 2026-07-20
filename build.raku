@@ -502,8 +502,10 @@ sub render-conformance(%site, %by-cat --> Str) {
       <h1>Roast conformance</h1>
       <p class="tagline">Where Raku++ stands against <a href="https://github.com/Raku/roast">Roast</a>,
       the official Raku specification test suite — the same tests this spec is verified against.</p>
-      <div class="conf-stats" id="conf-stats"></div>
+      <div class="conf-hero" id="conf-hero"></div>
+      <div class="conf-denoms" id="conf-denoms"></div>
     </div>
+    <h2 class="conf-areas-title">By synopsis <span>— tests that ran, per area</span></h2>
     <div class="conf-controls">
       <input type="search" id="conf-search" placeholder="Filter features…" aria-label="Filter features" autocomplete="off" spellcheck="false">
       <div class="conf-filters" id="conf-filters"></div>

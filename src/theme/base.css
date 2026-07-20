@@ -419,6 +419,24 @@ body.home .content { max-width: 66rem; }
 .conf-stat-n { font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; }
 .conf-stat-l { font-size: .8rem; color: var(--muted); }
 
+/* Headline: the honest all-declared pass rate, big. */
+.conf-hero { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin: 1.6rem 0 1rem; }
+.conf-big { font-size: 4rem; font-weight: 800; line-height: 1; letter-spacing: -.03em; color: #2da44e; }
+.conf-big-sub { display: flex; flex-direction: column; font-size: 1.05rem; font-weight: 600; }
+.conf-big-sub small { font-weight: 400; font-size: .82rem; color: var(--muted); margin-top: .2rem; }
+
+/* Three-denominator table. */
+.conf-denom-tbl { width: 100%; border-collapse: collapse; font-size: .9rem; margin: .5rem 0 1.5rem; }
+.conf-denom-tbl th, .conf-denom-tbl td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.conf-denom-tbl th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.conf-denom-tbl td { font-variant-numeric: tabular-nums; }
+.conf-denom-pct { font-weight: 700; }
+.conf-denom-note { color: var(--muted); font-variant-numeric: normal; }
+@media (max-width: 640px) { .conf-denom-note { display: none; } }
+
+.conf-areas-title { font-size: 1.1rem; margin: 1.5rem 0 .3rem; }
+.conf-areas-title span { color: var(--muted); font-weight: 400; font-size: .9rem; }
+
 .conf-controls {
   position: sticky;
   top: 0;

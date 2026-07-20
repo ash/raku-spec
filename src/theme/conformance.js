@@ -30,29 +30,42 @@
 
   fetch(url).then(function (r) { return r.json(); }).then(function (d) {
     state.data = d;
-    renderStats(d);
+    renderHeadline(d);
     renderFilters();
     render();
   }).catch(function () {
     root.textContent = 'Could not load the conformance map.';
   });
 
-  function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+  // Floor, not round: never overstate a pass rate (87.5% reads as 87%, matching
+  // docs/ROAST.md's quoted figure — rounding up to 88% would flatter).
+  function pct(a, b) { return b ? Math.floor(a / b * 100) : 0; }
+  function n(x) { return x.toLocaleString(); }
 
-  function renderStats(d) {
-    var t = d.totals;
-    // Lead with tests passing — the real measure of coverage. Files-fully-green is
-    // a strict secondary count (not a percentage, which would misread as success).
-    var tiles = [
-      ['Tests passing', pct(t.assertPass, t.assertTotal) + '%'],
-      ['Tests', t.assertPass.toLocaleString() + ' / ' + t.assertTotal.toLocaleString()],
-      ['Files fully green', t.pass.toLocaleString() + ' of ' + t.files.toLocaleString()],
-      ['Synopsis areas', d.synopses.length]
+  function renderHeadline(d) {
+    var c = d.counting;
+    // Headline is the honest "all declared" rate: every test the suite intends to
+    // run, including parse-error files that abort before emitting any TAP.
+    document.getElementById('conf-hero').innerHTML =
+      '<span class="conf-big">' + pct(c.passed, c.declared) + '%</span>' +
+      '<span class="conf-big-sub">of all declared Roast tests pass' +
+      '<small>' + n(c.passed) + ' / ' + n(c.declared) + ' · ' +
+      c.filesPass + ' of ' + c.filesTotal + ' files fully pass</small></span>';
+
+    // The three denominators, widest-to-strictest — same accounting as docs/ROAST.md.
+    var rows = [
+      ['tests that <b>ran</b>', c.passed, c.ran, 'only assertions files actually emitted'],
+      ['tests <b>planned</b>', c.passed, c.planned, '+ tests lost when a file aborts mid-plan'],
+      ['<b>all declared</b> tests', c.passed, c.declared, '+ tests in parse-error files, recovered from source']
     ];
-    document.getElementById('conf-stats').innerHTML = tiles.map(function (x) {
-      return '<div class="conf-stat"><span class="conf-stat-n">' + x[1] +
-             '</span><span class="conf-stat-l">' + x[0] + '</span></div>';
-    }).join('');
+    document.getElementById('conf-denoms').innerHTML =
+      '<table class="conf-denom-tbl"><thead><tr><th>Denominator</th><th>Passing</th>' +
+      '<th>Rate</th><th class="conf-denom-note">What it includes</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        return '<tr><td>' + r[0] + '</td><td>' + n(r[1]) + ' / ' + n(r[2]) + '</td>' +
+               '<td class="conf-denom-pct">' + pct(r[1], r[2]) + '%</td>' +
+               '<td class="conf-denom-note">' + r[3] + '</td></tr>';
+      }).join('') + '</tbody></table>';
   }
 
   function renderFilters() {

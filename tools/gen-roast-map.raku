@@ -50,8 +50,26 @@ sub MAIN(Str $results, Str $date = 'unknown') {
         ~ ',"files":' ~ @v[2] ~ ',"ap":' ~ @v[3] ~ ',"at":' ~ @v[4] ~ '}'
     });
 
+    # Authoritative conformance counting from run-roast's own summary (mirrored in
+    # raku++ docs/ROAST.md, reviewed). The per-file rows above are a local snapshot
+    # of tests that RAN; these totals are the honest whole-suite figures, incl. the
+    # ~238 no-TAP (parse-error) files whose declared tests can't be in the row data.
+    # REFRESH together with the results file: re-run tools/run-roast.raku, read its
+    # three-denominator summary, and update these six numbers + the date.
+    my %count =
+        passed     => 187749,
+        ran        => 193838,
+        planned    => 206987,
+        declared   => 214569,
+        filesPass  => 528,
+        filesTotal => 1462;
+    my $counting = '{"passed":' ~ %count<passed> ~ ',"ran":' ~ %count<ran>
+        ~ ',"planned":' ~ %count<planned> ~ ',"declared":' ~ %count<declared>
+        ~ ',"filesPass":' ~ %count<filesPass> ~ ',"filesTotal":' ~ %count<filesTotal> ~ '}';
+
     my $pass-files = @rows.grep(*.<st> eq 'pass').elems;
     my $json = '{"generated":' ~ json-str($date)
+        ~ ',"counting":' ~ $counting
         ~ ',"totals":{"files":' ~ $files ~ ',"pass":' ~ $pass-files
         ~ ',"assertPass":' ~ $ap ~ ',"assertTotal":' ~ $at ~ '}'
         ~ ',"synopses":[' ~ @syn-json.join(',') ~ ']'
