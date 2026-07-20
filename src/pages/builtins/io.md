@@ -4,7 +4,7 @@ slug: io
 status: full
 browser: false
 browser-why: needs the filesystem and subprocesses
-order: 20
+order: 78
 summary: Read and write files, run subprocesses — real in Raku++, but there's no browser filesystem.
 ---
 

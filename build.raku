@@ -545,10 +545,11 @@ sub render-conformance(%site, %by-cat --> Str) {
       (exact definition of every figure).</p>
     </div>
     <h2 class="conf-areas-title">Execution modes</h2>
-    <p class="conf-modes-intro">A Raku++ program can run three ways. Every example on
-    this site is verified to give the same output in all three — except features that
-    need capabilities the browser sandbox lacks, documented under
-    <a href="/native/concurrency.html">Beyond the browser</a>.</p>
+    <p class="conf-modes-intro">This is a reference for <strong>Raku++</strong> — the
+    interpreter. A program can run three ways, and every example here is verified to give
+    the same output in all three; the few features that need capabilities the browser
+    sandbox lacks (<a href="/concurrency/promises.html">concurrency</a>,
+    <a href="/builtins/io.html">IO</a>, deep recursion) are marked on their pages.</p>
     <div class="table-wrap"><table class="conf-modes-tbl">
       <thead><tr><th>Mode</th><th>How to run</th><th>Threads</th><th>Files &amp; IO</th><th>Deep recursion</th></tr></thead>
       <tbody>
@@ -601,7 +602,9 @@ sub render-page(%site, $page, %by-cat --> Str) {
         "<span class=\"status $cls\" title=\"{esc-attr($tip)}\">{$label}</span>" ~
         '</div>';
     $head ~= "<p class=\"summary\">{inline($page.summary)}</p>" if $page.summary;
-    $head ~= modes-html($page);
+    # This is a Raku++ reference: features run everywhere by default, so the
+    # three-mode indicator only appears where the browser engine is the exception.
+    $head ~= modes-html($page) unless $page.browser-ok;
     page-shell(%site, "{$page.title} — {%site<title>}", $head ~ $body, nav-html(%site, %by-cat, $page))
 }
 
