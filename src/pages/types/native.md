@@ -1,13 +1,14 @@
 ---
 title: Native types — int / num / str
 slug: native
-status: full
+status: divergent
 order: 70
-summary: Fixed-width machine types without the object wrapper, as scalars and arrays.
+summary: Fixed-width machine types, with one Raku++ difference on native arrays.
 ---
 
 Lowercase `int`, `num`, and `str` are **native** types — fixed-width machine values
-without the object wrapper of `Int`/`Num`/`Str`.
+without the object wrapper of `Int`/`Num`/`Str`. Native scalars behave the same in
+Raku++ and Rakudo; native *arrays* differ in their type (see the divergence).
 
 ## Native scalars
 
@@ -23,20 +24,32 @@ say $x.WHAT;
 (Int)
 ```
 
-## Native arrays
-
-A `my int @a` is a genuinely unboxed `array[int]` — a packed array of machine
-integers, distinct from the object `Array`.
+## Native arrays hold the values fine
 
 ```raku
 my int @a = 1, 2, 3;
 say @a;
-say @a.WHAT;
 ```
 ```output
 [1 2 3]
-(array[int])
 ```
+
+## Divergence: the native-array type
+
+A `my int @a` is a genuinely unboxed `array[int]` in Rakudo, but Raku++ represents it
+as the boxed `Array[int]`. The contents are identical; only the type object differs.
+
+```raku
+my int @a = 1, 2, 3;
+say @a.WHAT;
+```
+
+| Expression | Rakudo (reference) | Raku++ |
+| ---------- | ------------------ | ------ |
+| `(my int @a).WHAT` | `(array[int])` | `(Array[int])` |
+
+> Run the block to see Raku++'s result. This is a representation difference — the
+> array works either way.
 
 ## Notes
 
