@@ -25,6 +25,23 @@ say (1..5).sum;
 15
 ```
 
+A `Range` can report its own shape: `.excludes-min`/`.excludes-max` say whether each
+end is open, and `.int-bounds` gives the first and last *integer* it contains.
+
+```raku
+my $r = 1 ^..^ 10;
+say $r.excludes-min;
+say $r.excludes-max;
+say $r.int-bounds;
+```
+```output
+True
+True
+(2 9)
+```
+
+Both ends are excluded, so the integers run from `2` to `9`.
+
 ## String ranges
 
 Endpoints can be strings; the range walks the string-increment sequence.

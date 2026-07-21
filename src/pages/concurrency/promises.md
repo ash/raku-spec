@@ -71,6 +71,49 @@ say @p.map(*.result);
 (10 20 30)
 ```
 
+## Producing a Promise — vow
+
+`start` gives you a Promise that some code fulfils. To create and fulfil one *by
+hand*, take its **vow** (the private write-capability) and `.keep` it with a value —
+or `.break` it with a failure.
+
+```raku
+my $p = Promise.new;
+my $v = $p.vow;
+$v.keep(42);
+say await $p;
+```
+```output
+42
+```
+
+`.break` moves the Promise to the `Broken` status; awaiting a broken Promise
+rethrows.
+
+```raku
+my $p = Promise.new;
+$p.vow.break("nope");
+say $p.status;
+```
+```output
+Broken
+```
+
+## Guarding shared state — Lock
+
+When several threads touch the same data, a `Lock` serialises access: `.protect`
+runs its block with the lock held, so updates don't interleave.
+
+```raku
+my $lock = Lock.new;
+my @log;
+await (^3).map(-> $i { start { $lock.protect({ @log.push($i) }) } });
+say @log.sort;
+```
+```output
+(0 1 2)
+```
+
 ## Channels
 
 A `Channel` is a thread-safe queue: one thread `.send`s, another reads. Closing it

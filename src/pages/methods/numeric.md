@@ -65,6 +65,25 @@ Int
 Rat
 ```
 
+## Bit positions — msb / lsb
+
+`.msb` and `.lsb` give the index (from 0) of the most- and least-significant set bit —
+the position of the top `1` and the bottom `1` in the binary form.
+
+```raku
+say 8.msb;
+say 12.lsb;
+say 255.msb;
+```
+```output
+3
+2
+7
+```
+
+`8` is `1000`, so its only bit is at index 3; `12` is `1100`, whose lowest set bit is
+at index 2; `255` is eight ones, top bit at index 7.
+
 ## base — render in another radix
 
 `base(n)` renders an integer in radix `n` (2–36) as a string.

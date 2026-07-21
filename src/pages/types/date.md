@@ -50,6 +50,24 @@ True
 
 2024-02-29 is the 60th day of a leap year, and February that year has 29 days.
 
+There are week-based accessors too: `.week` returns the ISO `(year, week-number)`
+pair, `.week-year` just the ISO year, and `.weekday-of-month` which weekday-occurrence
+this is (e.g. the 3rd Tuesday).
+
+```raku
+my $d = Date.new(2026, 7, 21);
+say $d.week;
+say $d.week-year;
+say $d.weekday-of-month;
+```
+```output
+(2026 30)
+2026
+3
+```
+
+2026-07-21 falls in ISO week 30, and it's the 3rd Tuesday of the month.
+
 ## Date arithmetic
 
 Subtracting two `Date`s yields the number of days between them; `.later` and
