@@ -1,14 +1,15 @@
 ---
 title: Unicode & graphemes
 slug: unicode
-status: divergent
+status: full
 order: 45
-summary: Grapheme-aware length, codepoints, names and values — with one normalization difference.
+summary: Grapheme-aware length, codepoints, names, values, and normalization.
 ---
 
 Raku strings are sequences of **graphemes** (what a reader perceives as a character),
-not bytes or codepoints. `.chars` counts graphemes and matches Rakudo; the difference
-is that Raku++ does not normalise combining sequences (see the divergence).
+not bytes or codepoints. `.chars` counts graphemes, and Raku++ normalises combining
+sequences the way Rakudo does — so a base letter plus a combining mark is one
+character *and* composes to a single codepoint.
 
 ## Grapheme-aware length
 
@@ -43,31 +44,39 @@ GREEK SMALL LETTER ALPHA
 0.5
 ```
 
-## Divergence: normalization
+## Normalization
 
-Rakudo normalises strings (NFG/NFC), so `e` + a combining acute becomes the single
-precomposed `é` — one codepoint. Raku++ counts it as **one grapheme** but keeps the
-**two codepoints**, unnormalised.
+A composed and a decomposed spelling of the same text compare equal, because both
+normalise: `e` plus a combining acute becomes the single codepoint `é`.
 
 ```raku
 my $s = "e" ~ "\x[301]";
 say $s.codes;
+say $s eq "é";
+```
+```output
+1
+True
 ```
 
-| Value | Rakudo (reference) | Raku++ |
-| ----- | ------------------ | ------ |
-| `("e" ~ "\x[301]").chars` | `1` | `1` |
-| `("e" ~ "\x[301]").codes` | `1` (NFC) | `2` (unnormalised) |
+`.codes` is `1` — the two-codepoint input was composed to one. The `.NFD`/`.NFC`
+methods expose the forms explicitly: decomposed is two codepoints, composed is one.
 
-> Run the block to see Raku++'s result. Grapheme operations (`.chars`, indexing,
-> reversing) work correctly; the difference shows only in codepoint counts and when
-> comparing a composed vs decomposed spelling of the same text.
+```raku
+say "é".NFD.codes;
+say "é".NFC.codes;
+```
+```output
+2
+1
+```
 
 ## Notes
 
 - `.codes` counts codepoints, `.chars` counts graphemes — they differ whenever a
-  grapheme is built from more than one codepoint.
+  grapheme is built from more than one codepoint (an emoji with a skin-tone modifier,
+  say), even after normalization.
 - `.ords` returns all codepoints as a list; `.uniprop` exposes character properties
   (`"A".uniprop` is `Lu`, an uppercase letter).
-- Because of the normalization difference, treat `.codes` and codepoint-level
-  identity as implementation-specific in Raku++; grapheme-level operations are safe.
+- `.NFD`, `.NFC`, `.NFKD`, `.NFKC` give the four Unicode normalization forms as
+  codepoint sequences.
