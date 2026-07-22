@@ -66,19 +66,33 @@ sub MAIN(Str $results, Str $date = 'unknown', Str $roast = '/Users/ash/roast') {
         ~ ',"files":' ~ @v[2] ~ ',"ap":' ~ @v[3] ~ ',"at":' ~ @v[4] ~ '}'
     });
 
-    # Authoritative conformance counting from run-roast's own summary (mirrored in
-    # raku++ docs/ROAST.md, reviewed). The per-file rows above are a local snapshot
-    # of tests that RAN; these totals are the honest whole-suite figures, incl. the
-    # ~238 no-TAP (parse-error) files whose declared tests can't be in the row data.
-    # REFRESH together with the results file: re-run tools/run-roast.raku, read its
-    # three-denominator summary, and update these six numbers + the date.
-    my %count =
-        passed     => 187749,
-        ran        => 193838,
-        planned    => 206987,
-        declared   => 214569,
-        filesPass  => 528,
-        filesTotal => 1462;
+    # Authoritative conformance counting parsed from run-roast's own summary at
+    # the bottom of the results file (the same three-denominator block quoted in
+    # raku++ docs/ROAST.md). The per-file rows above are a snapshot of tests that
+    # RAN; the summary carries the honest whole-suite figures, incl. no-TAP
+    # (parse-error) files whose declared tests can't be in the row data. Parsing
+    # it here means a fresh results file IS the refresh — no hand-maintained
+    # numbers to forget (the 2026-07-22 site briefly showed a stale 87% headline
+    # because these six values used to be literals).
+    my %count;
+    for $results.IO.lines -> $ln {
+        if $ln ~~ / 'Files fully passing:' \s+ (\d+) \s* '/' \s* (\d+) / {
+            %count<filesPass>  = +$0;
+            %count<filesTotal> = +$1;
+        }
+        elsif $ln ~~ / 'Assertions passed:' \s+ (\d+) \s* '/' \s* (\d+) / {
+            %count<passed> = +$0;
+            my $d = +$1;
+            if    $ln.contains('tests that ran') { %count<ran>      = $d }
+            elsif $ln.contains('planned')        { %count<planned>  = $d }
+            elsif $ln.contains('declared')       { %count<declared> = $d }
+        }
+    }
+    for <passed ran planned declared filesPass filesTotal> -> $k {
+        die "results file has no run-roast summary block (missing '$k') — "
+            ~ "pass a full tools/run-roast.raku output file"
+            unless %count{$k}:exists;
+    }
     my $counting = '{"passed":' ~ %count<passed> ~ ',"ran":' ~ %count<ran>
         ~ ',"planned":' ~ %count<planned> ~ ',"declared":' ~ %count<declared>
         ~ ',"filesPass":' ~ %count<filesPass> ~ ',"filesTotal":' ~ %count<filesTotal> ~ '}';
