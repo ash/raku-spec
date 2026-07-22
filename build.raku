@@ -817,7 +817,7 @@ sub verify-examples(@pages, Str $rakupp, Str $oracle, Str $wasm = '' --> Int) {
                 '{"p":' ~ json-esc(.<p>) ~ ',"s":' ~ json-esc(.<s>) ~ ',"e":' ~ json-esc(.<e>) ~ '}'
             }).join(',') ~ ']';
             spurt('out/.wasm-examples.json', $json);
-            my $proc = run('node', 'tools/wasm-verify.cjs', $wasm, 'out/.wasm-examples.json',
+            my $proc = run('bun', 'tools/wasm-verify.cjs', $wasm, 'out/.wasm-examples.json',
                            :out, :err);
             print $proc.out.slurp(:close);
             my $werr = $proc.err.slurp(:close);

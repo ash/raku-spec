@@ -1,6 +1,6 @@
-#!/usr/bin/env node
-// wasm-verify.cjs — the spec's third verification gate. build.raku calls this with
-// the Node build of raku.js (the same C++ the browser editors run) and a JSON list
+#!/usr/bin/env bun
+// wasm-verify.cjs — the spec's third verification gate. build.raku runs this under Bun with
+// the node-target build of raku.js (the same C++ the browser editors run) and a JSON list
 // of the exact examples it just checked; each is run through the WASM engine and
 // diffed against the declared output. Exits non-zero if any diverge, so an example
 // that works in native Raku++ but not in the browser can't ship silently.

@@ -6,8 +6,8 @@
 #   SPEC_DEST   destination directory to publish to (the server's doc root)
 #   ORACLE      optional 2nd interpreter to cross-check every example against
 #               (e.g. raku = Rakudo); a divergence aborts the deploy
-#   WASM        optional Node build of raku.js (the browser engine); every example
-#               is run through it too, so a browser-only divergence aborts the deploy
+#   WASM        optional node-target build of raku.js (the browser engine); every
+#               example is run through it too (under Bun), so a browser-only divergence aborts the deploy
 #
 # Set them in a git-ignored ./.deploy.env, via the environment, or pass the
 # destination as the first argument:
