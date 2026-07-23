@@ -1,0 +1,45 @@
+name: Deploy to GitHub Pages
+
+# Build the spec site with the latest released rakupp binary, verify every
+# example against it (as deploy.sh does), and publish out/.
+# ORACLE/WASM cross-checks stay a local pre-push concern.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install rakupp (latest release)
+        run: |
+          curl -fsSL -o /tmp/rakupp.tar.gz \
+            https://github.com/ash/rakupp/releases/latest/download/rakupp-linux-x86_64.tar.gz
+          tar xzf /tmp/rakupp.tar.gz -C /tmp
+          echo /tmp/rakupp/bin >> "$GITHUB_PATH"
+          /tmp/rakupp/bin/rakupp --version
+
+      - name: Build and verify
+        run: rakupp build.raku --clean --verify --rakupp=/tmp/rakupp/bin/rakupp
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+      - id: deployment
+        uses: actions/deploy-pages@v4
