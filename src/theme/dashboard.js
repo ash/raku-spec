@@ -45,11 +45,13 @@
   // Mark spec: 2px lines, small round markers, hairline grid, 0-based y axis.
   // Interaction: nearest-point crosshair + tooltip. Identity: legend chips for
   // >=2 series plus a direct label at each line's end (ink text, colored dot).
-  // Round a data maximum up to a "nice" axis maximum (1 / 2 / 2.5 / 5 × 10^k).
+  // Round a data maximum up to a "nice" axis maximum (1/2/2.5/4/5/8 × 10^k) —
+  // the tightest nice ceiling, so lines fill the plot instead of sitting in
+  // the bottom half under empty headroom.
   function niceMax(v) {
     var p = Math.pow(10, Math.floor(Math.log10(v)));
     var m = v / p;
-    var f = m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10;
+    var f = m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 4 ? 4 : m <= 5 ? 5 : m <= 8 ? 8 : 10;
     return f * p;
   }
   // Prefer a tick count whose step is itself nice (integers on small axes).
@@ -187,24 +189,52 @@
       if (lastMod) tile(lastMod.n + ' / ' + lastMod.total, 'top-50 modules running byte-identical');
       tile(String(rel.length - 1), 'releases tracked (plus main)');
 
-      // ---- Roast chart -------------------------------------------------
+      // ---- Roast charts ------------------------------------------------
+      // Two measures on two scales — so two charts, never one dual axis.
+      // Tests passing is a share (%); fully-passing files is a COUNT: as a
+      // share of the suite the strict all-or-nothing bar reads as "failing",
+      // which is the wrong impression — the count rising is the fact.
+      // Both series are prefixed with the pre-release daily points mined from
+      // ROAST.md's git history; the % series starts only where the modern
+      // "declared" denominator applies (the miner already filtered the rest).
+      var dev = data.dev || [];
+      var span = dev.concat(rel);
+      var devCount = dev.length;
       var tagLabels = rel.map(function (r) { return r.tag; });
-      var testsPct = rel.map(function (r) { return 100 * r.tests_pass / r.tests_total; });
-      var filesPct = rel.map(function (r) {
-        return r.files_pass == null ? null : 100 * r.files_pass / r.files_total;
+      var spanLabels = span.map(function (r) { return r.tag; });
+      var testsPct = span.map(function (r) {
+        return r.tests_total ? 100 * r.tests_pass / r.tests_total : null;
       });
-      lineChart(document.getElementById('dash-roast'), {
-        labels: tagLabels,
-        series: [
-          { name: 'declared tests passing', cls: 's1', values: testsPct },
-          { name: 'files fully passing',    cls: 's2', values: filesPct }
-        ],
+      var filesN = span.map(function (r) { return r.files_pass; });
+      var roast = document.getElementById('dash-roast');
+      roast.textContent = '';
+      function preTag(i) { return i < devCount ? ' · pre-release' : ''; }
+
+      var cardA = div('dash-bench-card', roast);
+      div('dash-card-title', cardA, 'declared tests passing');
+      lineChart(div('dash-chart', cardA), {
+        labels: spanLabels,
+        series: [{ name: 'declared tests passing', cls: 's1', values: testsPct }],
         yMax: 100,
         yFmt: function (v) { return v + '%'; },
+        width: 380, height: 230, maxXLabels: 5,
         tipRow: function (si, i) {
-          var r = rel[i];
-          if (si === 0) return 'tests: ' + testsPct[i].toFixed(1) + '% (' + fmt(r.tests_pass) + ' / ' + fmt(r.tests_total) + ')';
-          return 'files: ' + filesPct[i].toFixed(1) + '% (' + fmt(r.files_pass) + ' / ' + fmt(r.files_total) + ')';
+          var r = span[i];
+          return 'tests: ' + testsPct[i].toFixed(1) + '% (' + fmt(r.tests_pass) + ' / ' + fmt(r.tests_total) + ')' + preTag(i);
+        }
+      });
+
+      var cardB = div('dash-bench-card', roast);
+      div('dash-card-title', cardB, 'files fully passing (of ' + fmt(last.files_total) + ' in the suite)');
+      lineChart(div('dash-chart', cardB), {
+        labels: spanLabels,
+        series: [{ name: 'files fully passing', cls: 's2', values: filesN }],
+        yMax: niceMax(Math.max.apply(null, filesN.filter(function (v) { return v != null; }))),
+        yFmt: function (v) { return fmt(Math.round(v)); },
+        width: 380, height: 230, maxXLabels: 5,
+        tipRow: function (si, i) {
+          var r = span[i];
+          return 'files: ' + fmt(r.files_pass) + (r.files_total ? ' of ' + fmt(r.files_total) : '') + preTag(i);
         }
       });
 

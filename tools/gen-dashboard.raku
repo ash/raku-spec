@@ -102,6 +102,60 @@ sub bench-at(Str $repo, Str $ref --> Hash) {
 }
 
 # ---------------------------------------------------------------------------
+# Pre-release history: one point per day from ROAST.md's own git history
+# before the first tag. The file-count series is comparable all the way back;
+# the declared-% is only taken where the modern denominator applies (the
+# "declared" methodology was introduced 2026-07-09 with a ~231k denominator
+# and redefined 2026-07-10 to the current plan-read form — points from the
+# 231k era would fake a +16pt jump, so they are excluded from the % series).
+# ---------------------------------------------------------------------------
+
+constant OLD-DENOMINATOR-CUTOFF = 220_000;
+
+constant @MONTHS = <? Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec>;
+
+sub short-date(Str $iso --> Str) {
+    my @p = $iso.split('-');
+    @MONTHS[@p[1].Int] ~ ' ' ~ @p[2].Int
+}
+
+sub dev-series(Str $repo, Str $first-tag --> Array) {
+    my @points;
+    my %seen-date;
+    # Reverse-chronological; the first commit met on a date is that day's last.
+    for run-lines('git', '-C', $repo, 'log', '--format=%H %as', '--follow',
+                  $first-tag, '--', 'docs/ROAST.md') -> $line {
+        my ($sha, $date) = $line.words;
+        next unless $date.defined;
+        next if %seen-date{$date};
+        %seen-date{$date} = True;
+        my $md = show-file($repo, $sha, 'docs/ROAST.md');
+        $md = show-file($repo, $sha, 'ROAST.md') unless $md;
+        next unless $md;
+        my %r;
+        for $md.lines -> $l {
+            if $l.trim.starts-with('| **Fully passing**') {
+                my @cells = $l.split('|');
+                %r<files-pass> = denum(@cells[2]) if @cells.elems > 2;
+            }
+            elsif $l.contains('Headline:') && $l.contains('(') {
+                my $inside = $l.substr($l.index('(') + 1);
+                $inside = $inside.substr(0, $inside.index(')')) if $inside.contains(')');
+                my ($a, $b) = $inside.split('/');
+                if $a.defined && $b.defined && denum($b) <= OLD-DENOMINATOR-CUTOFF {
+                    %r<tests-pass>  = denum($a);
+                    %r<tests-total> = denum($b);
+                }
+            }
+        }
+        next unless %r<files-pass>:exists;
+        %r<date> = $date;
+        @points.push(%r);
+    }
+    @points.sort(-> %p { %p<date> }).Array
+}
+
+# ---------------------------------------------------------------------------
 # Tier-2 battery standing out of the battery repo's commit subjects
 # ---------------------------------------------------------------------------
 
@@ -155,9 +209,11 @@ sub MAIN(Str :$rakupp-repo = '../raku++', Str :$battery = '../raku-module-batter
     @refs.push('HEAD');
 
     my @entries;
+    my $first-charted = '';
     for @refs -> $ref {
         my %roast = roast-at($rakupp-repo, $ref);
         next unless %roast<tests-pass>:exists;
+        $first-charted = $ref unless $first-charted;
         my %bench = bench-at($rakupp-repo, $ref);
         my $label = $ref eq 'HEAD' ?? 'main' !! $ref;
         my @f;
@@ -174,6 +230,22 @@ sub MAIN(Str :$rakupp-repo = '../raku++', Str :$battery = '../raku-module-batter
             "{%bench.keys.elems} kernels";
     }
 
+    # Pre-release run-up: daily points from ROAST.md's history before the
+    # first release that carries chartable numbers.
+    my @dev;
+    if $first-charted {
+        for @(dev-series($rakupp-repo, $first-charted)) -> %p {
+            my @f;
+            @f.push('"tag":' ~ json-esc(short-date(%p<date>)));
+            @f.push('"date":' ~ json-esc(%p<date>));
+            @f.push('"files_pass":' ~ %p<files-pass>);
+            @f.push('"tests_pass":' ~ %p<tests-pass>)   if %p<tests-pass>:exists;
+            @f.push('"tests_total":' ~ %p<tests-total>) if %p<tests-total>:exists;
+            @dev.push('{' ~ @f.join(',') ~ '}');
+        }
+    }
+    say "  pre-release: {@dev.elems} daily points before $first-charted";
+
     my @mods;
     for @(battery-series($battery)) -> %p {
         my $batch = %p<batch>:exists ?? ',"batch":' ~ %p<batch> !! '';
@@ -183,6 +255,7 @@ sub MAIN(Str :$rakupp-repo = '../raku++', Str :$battery = '../raku-module-batter
 
     my $today = run-lines('git', '-C', $rakupp-repo, 'log', '-1', '--format=%as', 'HEAD').head // '';
     my $json = '{"generated":' ~ json-esc($today) ~
+               ',"dev":['      ~ @dev.join(',')     ~ ']' ~
                ',"releases":[' ~ @entries.join(',') ~ ']' ~
                ',"modules":['  ~ @mods.join(',')    ~ ']}';
     mkdir('src/data');

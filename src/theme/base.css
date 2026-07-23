@@ -820,5 +820,6 @@ html[data-theme-active="dark"] {
 }
 .dash-bench-card { min-width: 0; }
 .dash-bench-title { font-weight: 700; margin-bottom: .1rem; font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: .9rem; }
+.dash-card-title { font-weight: 700; margin-bottom: .1rem; font-size: .9rem; }
 .dash-bench .dash-chart { margin-bottom: .4rem; }
 .dash-bench .dash-table { margin-top: 0; }

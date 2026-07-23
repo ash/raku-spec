@@ -589,8 +589,16 @@ sub render-dashboard(%site, %by-cat --> Str) {
       the repos' own docs; nothing is measured at build time.</p>
       <div class="conf-stats" id="dash-tiles"></div>
     </div>
-    <h2 class="conf-areas-title">Roast <span>— share of declared tests passing, per release</span></h2>
-    <div class="dash-chart" id="dash-roast" aria-live="polite">Loading…</div>
+    <h2 class="conf-areas-title">Roast <span>— tests passing and fully-passing files, per release</span></h2>
+    <p class="dash-note">A file counts as <em>fully passing</em> only when every
+    single test in it passes — one failure anywhere and the whole file drops out
+    of the count. That strict bar is why the right-hand number is small next to
+    the 90% of individual tests passing on the left. Both series start before
+    the first tag, mined from ROAST.md's own git history — one point per day;
+    the %-series begins on Jul 10, when the current "declared" denominator was
+    defined (earlier percentages used a different counting method and would not
+    be comparable).</p>
+    <div class="dash-bench" id="dash-roast" aria-live="polite">Loading…</div>
     <h2 class="conf-areas-title">Ecosystem <span>— top-50 module battery, byte-identical runs</span></h2>
     <div class="dash-chart" id="dash-modules"></div>
     <h2 class="conf-areas-title">Benchmarks <span>— kernel wall time in ms, lower is better</span></h2>
