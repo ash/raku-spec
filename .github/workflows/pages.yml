@@ -1,8 +1,8 @@
 name: Deploy to GitHub Pages
 
-# Build the spec site with the latest released rakupp binary, verify every
-# example against it (as deploy.sh does), and publish out/.
-# ORACLE/WASM cross-checks stay a local pre-push concern.
+# Build the spec site with the latest released rakupp binary and publish out/.
+# Verification (--verify against rakupp, plus the Rakudo oracle and the WASM
+# engine) stays a local pre-push gate in deploy.sh — not run on every push.
 on:
   push:
     branches: [main]
@@ -35,8 +35,8 @@ jobs:
           echo /tmp/rakupp/bin >> "$GITHUB_PATH"
           /tmp/rakupp/bin/rakupp --version
 
-      - name: Build and verify
-        run: rakupp build.raku --clean --verify --rakupp=/tmp/rakupp/bin/rakupp
+      - name: Build the site
+        run: rakupp build.raku --clean
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
