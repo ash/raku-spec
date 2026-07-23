@@ -165,10 +165,12 @@ sub asset-version(--> Str) {
     @files.push('src/site.raku');
     @files.push('src/data/roast-map.json') if 'src/data/roast-map.json'.IO.e;
     my $blob = @files.sort.map({ slurp($_) }).join;
-    my $p = run('md5', '-q', :in, :out);
+    # `md5 -q` on macOS, `md5sum` elsewhere (same hash, different wrapper).
+    my @cmd = $*KERNEL.name eq 'darwin' ?? ('md5', '-q') !! ('md5sum',);
+    my $p = run(|@cmd, :in, :out);
     $p.in.print($blob);
     $p.in.close;
-    $p.out.slurp(:close).trim.substr(0, 8)
+    $p.out.slurp(:close).words[0].substr(0, 8)
 }
 
 # Parse a fence info string like `raku run stdin="Ada\nGrace"` into (lang, %opts).
