@@ -168,6 +168,7 @@ sub asset-version(--> Str) {
     }
     @files.push('src/site.raku');
     @files.push('src/data/roast-map.json') if 'src/data/roast-map.json'.IO.e;
+    @files.push('src/data/dashboard.json') if 'src/data/dashboard.json'.IO.e;
     my $blob = @files.sort.map({ slurp($_) }).join;
     my $p = run('cksum', :in, :out);
     $p.in.print($blob);
@@ -575,6 +576,35 @@ sub render-conformance(%site, %by-cat --> Str) {
                nav-html(%site, %by-cat, Nil), :extra-scripts($extra))
 }
 
+# The dashboard — Raku++ by the numbers over releases, rendered client-side by
+# dashboard.js from the committed src/data/dashboard.json snapshot (mined from
+# the repos' own docs by tools/gen-dashboard.raku; re-run it at each release).
+sub render-dashboard(%site, %by-cat --> Str) {
+    my $body = q:to/BODY/;
+    <div class="conf-head">
+      <h1>Dashboard</h1>
+      <p class="tagline">Raku++ by the numbers, release over release — the
+      <a href="/conformance/">Roast</a> standing, the ecosystem module battery,
+      and the benchmark kernels. Every point is mined from numbers committed in
+      the repos' own docs; nothing is measured at build time.</p>
+      <div class="conf-stats" id="dash-tiles"></div>
+    </div>
+    <h2 class="conf-areas-title">Roast <span>— share of declared tests passing, per release</span></h2>
+    <div class="dash-chart" id="dash-roast" aria-live="polite">Loading…</div>
+    <h2 class="conf-areas-title">Ecosystem <span>— top-50 module battery, byte-identical runs</span></h2>
+    <div class="dash-chart" id="dash-modules"></div>
+    <h2 class="conf-areas-title">Benchmarks <span>— kernel wall time in ms, lower is better</span></h2>
+    <p class="dash-note">Three ways to run the same program: the Raku++
+    interpreter, the same source compiled to a native binary with
+    <code>--exe</code>, and Rakudo as the reference. Absolute times from
+    BENCHMARKS.md as committed at each release (same machine throughout).</p>
+    <div class="dash-bench" id="dash-bench"></div>
+    BODY
+    my $extra = "<script src=\"/theme/dashboard.js?v={$VERSION}\" defer></script>";
+    page-shell(%site, 'Dashboard — Raku++ Specification', $body,
+               nav-html(%site, %by-cat, Nil), :extra-scripts($extra))
+}
+
 # Where a feature runs: the three execution targets. Interpreter and --exe run
 # everything; the browser (WASM) engine is the only constrained one, and a page marks
 # itself `browser: false` (+ optional `browser-why`) when a feature needs threads, the
@@ -670,6 +700,7 @@ sub render-home(%site, %by-cat --> Str) {
         "<p class=\"hero-stats\">$features features across $pages pages · " ~
         "every example verified against Raku++, Rakudo, and the in-browser engine</p>" ~
         "<p class=\"hero-links\"><a href=\"/conformance/\">See the full Roast conformance map →</a>" ~
+        ('src/data/dashboard.json'.IO.e ?? ' <a href="/dashboard/">Dashboard →</a>' !! '') ~
         "{$excels-link}</p>" ~
         '</div>';
 
@@ -880,6 +911,13 @@ sub MAIN(Bool :$verify = False, Bool :$clean = False, Str :$rakupp = RAKUPP-DEFA
         mkdir('out/conformance');
         spurt('out/conformance/index.html', render-conformance(%site, $by-cat));
         spurt('out/roast-map.json', slurp('src/data/roast-map.json'));
+    }
+
+    # Release dashboard (special page + its committed data snapshot).
+    if 'src/data/dashboard.json'.IO.e {
+        mkdir('out/dashboard');
+        spurt('out/dashboard/index.html', render-dashboard(%site, $by-cat));
+        spurt('out/dashboard.json', slurp('src/data/dashboard.json'));
     }
 
     # "Where Raku++ excels" index — emitted only when some page carries the section.

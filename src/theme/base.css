@@ -754,3 +754,71 @@ footer {
   body.nav-open .sidebar { transform: translateX(0); }
   .content { padding-top: 3.6rem; }
 }
+
+/* ---- dashboard -------------------------------------------------------- */
+/* Series colors validated (CVD + contrast) for both surfaces; the Rakudo
+   reference line is muted ink, dashed — a baseline, not a competitor. */
+:root {
+  --dash-s1:  #2a78d6;   /* interpreter / primary metric */
+  --dash-s2:  #1baf7a;   /* native --exe / secondary metric */
+  --dash-ref: #898781;   /* Rakudo reference */
+}
+html[data-theme-active="dark"] {
+  --dash-s1: #3987e5;
+  --dash-s2: #199e70;
+}
+
+.dash-chart { margin: .6rem 0 1.6rem; }
+.dash-svg { width: 100%; height: auto; display: block; }
+.dash-grid  { stroke: var(--border); stroke-width: 1; }
+.dash-cross { stroke: var(--muted);  stroke-width: 1; stroke-dasharray: 3 3; }
+.dash-tick  { fill: var(--muted); font-size: 11px; }
+.dash-line  { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.dash-line.dashed { stroke-dasharray: 5 4; }
+.s1   { stroke: var(--dash-s1); }
+.s2   { stroke: var(--dash-s2); }
+.sref { stroke: var(--dash-ref); }
+/* Dots after the series classes so their fill + surface ring win the cascade
+   (paths must stay fill:none — a filled line path renders as a wedge). */
+.dash-dot { stroke: var(--bg); stroke-width: 1.5; }
+.dash-dot.s1   { fill: var(--dash-s1); }
+.dash-dot.s2   { fill: var(--dash-s2); }
+.dash-dot.sref { fill: var(--dash-ref); }
+
+.dash-legend { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; margin: .2rem 0 .3rem; }
+.dash-chip { display: inline-flex; align-items: center; gap: .4rem; font-size: .82rem; color: var(--muted); }
+.dash-swatch {
+  display: inline-block; width: 14px; height: 3px; border-radius: 2px;
+  background: currentColor;
+}
+.dash-swatch.s1 { background: var(--dash-s1); }
+.dash-swatch.s2 { background: var(--dash-s2); }
+.dash-swatch.sref { background: var(--dash-ref); }
+.dash-swatch.dashed {
+  background: repeating-linear-gradient(90deg, var(--dash-ref) 0 4px, transparent 4px 7px);
+}
+
+.dash-tip {
+  position: absolute; z-index: 40; pointer-events: none;
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: .45rem .65rem; font-size: .8rem; color: var(--fg);
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);
+}
+.dash-tip-head { font-weight: 700; margin-bottom: .25rem; }
+.dash-tip-row { display: flex; align-items: center; gap: .4rem; white-space: nowrap; }
+
+.dash-note { color: var(--muted); font-size: .9rem; }
+.dash-table { margin: .1rem 0 1.6rem; }
+.dash-table > summary { cursor: pointer; color: var(--muted); font-size: .82rem; user-select: none; }
+.dash-table > summary:hover { color: var(--accent); }
+.dash-table table { font-size: .82rem; margin-top: .5rem; }
+.dash-table td, .dash-table th { font-variant-numeric: tabular-nums; }
+
+.dash-bench {
+  display: grid; gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.dash-bench-card { min-width: 0; }
+.dash-bench-title { font-weight: 700; margin-bottom: .1rem; font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: .9rem; }
+.dash-bench .dash-chart { margin-bottom: .4rem; }
+.dash-bench .dash-table { margin-top: 0; }
