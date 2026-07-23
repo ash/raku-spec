@@ -156,7 +156,11 @@ sub json-esc(Str $s --> Str) {
     '"' ~ $e ~ '"'
 }
 
-# 8-char content hash over every source (theme + pages + config) — the cache tag.
+# Content-derived cache tag stamped onto theme asset URLs (?v=…). Uses cksum:
+# POSIX, present on both macOS and Linux, so the build runs anywhere (the CI
+# runner included) — unlike md5/md5sum, which differ per OS. rakupp hardcodes
+# $*KERNEL.name to "darwin", so we can't branch on the OS anyway. Only needs to
+# change when any source changes; the exact digest (CRC vs MD5) is irrelevant.
 sub asset-version(--> Str) {
     my @files = dir('src/theme').grep({ .IO.f }).map(*.Str);
     for dir('src/pages').grep({ .IO.d }).sort -> $cat {
@@ -165,9 +169,7 @@ sub asset-version(--> Str) {
     @files.push('src/site.raku');
     @files.push('src/data/roast-map.json') if 'src/data/roast-map.json'.IO.e;
     my $blob = @files.sort.map({ slurp($_) }).join;
-    # `md5 -q` on macOS, `md5sum` elsewhere (same hash, different wrapper).
-    my @cmd = $*KERNEL.name eq 'darwin' ?? ('md5', '-q') !! ('md5sum',);
-    my $p = run(|@cmd, :in, :out);
+    my $p = run('cksum', :in, :out);
     $p.in.print($blob);
     $p.in.close;
     $p.out.slurp(:close).words[0].substr(0, 8)
