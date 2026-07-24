@@ -142,9 +142,14 @@ sub dev-series(Str $repo, Str $first-tag --> Array) {
                 my $inside = $l.substr($l.index('(') + 1);
                 $inside = $inside.substr(0, $inside.index(')')) if $inside.contains(')');
                 my ($a, $b) = $inside.split('/');
-                if $a.defined && $b.defined && denum($b) <= OLD-DENOMINATOR-CUTOFF {
+                if $a.defined && $b.defined {
                     %r<tests-pass>  = denum($a);
                     %r<tests-total> = denum($b);
+                    # The 2026-07-09 "declared" figure used a wider ~231k denominator,
+                    # redefined the next day. We now surface that point too, but flag it
+                    # so the chart marks the re-baseline step instead of implying a real
+                    # +16pt jump between it and the 2026-07-10 point.
+                    %r<rebaselined> = True if denum($b) > OLD-DENOMINATOR-CUTOFF;
                 }
             }
         }
@@ -241,6 +246,7 @@ sub MAIN(Str :$rakupp-repo = '../raku++', Str :$battery = '../raku-module-batter
             @f.push('"files_pass":' ~ %p<files-pass>);
             @f.push('"tests_pass":' ~ %p<tests-pass>)   if %p<tests-pass>:exists;
             @f.push('"tests_total":' ~ %p<tests-total>) if %p<tests-total>:exists;
+            @f.push('"rebaselined":true')               if %p<rebaselined>;
             @dev.push('{' ~ @f.join(',') ~ '}');
         }
     }

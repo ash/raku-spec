@@ -220,9 +220,16 @@
         width: 380, height: 230, maxXLabels: 5,
         tipRow: function (si, i) {
           var r = span[i];
-          return 'tests: ' + testsPct[i].toFixed(1) + '% (' + fmt(r.tests_pass) + ' / ' + fmt(r.tests_total) + ')' + preTag(i);
+          var note = r && r.rebaselined ? ' · wider pre-2026-07-10 denominator' : '';
+          return 'tests: ' + testsPct[i].toFixed(1) + '% (' + fmt(r.tests_pass) + ' / ' + fmt(r.tests_total) + ')' + preTag(i) + note;
         }
       });
+      if (span.some(function (r) { return r && r.rebaselined; })) {
+        div('dash-note', cardA,
+          'The earliest declared-% point (2026-07-09) is measured against a wider ' +
+          'denominator that was redefined the next day — the step to 2026-07-10 is that ' +
+          're-baseline, not a real jump.');
+      }
 
       var cardB = div('dash-bench-card', roast);
       div('dash-card-title', cardB, 'files fully passing (of ' + fmt(last.files_total) + ' in the suite)');
